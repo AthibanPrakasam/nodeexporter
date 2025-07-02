@@ -1,0 +1,33 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+
+
+# Virtual environment
+venv/
+
+# VSCode settings (if used)
+.vscode/
+
+# macOS system files
+.DS_Store
+
+# Logs and local env files
+*.log
+.env
+*.env
+
+# Docker-related
+*.tar
+*.bak
+*.backup
+
+# Jupyter notebooks checkpoints
+.ipynb_checkpoints/
+
+# OS generated files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Git ignore self
+.gitignore
