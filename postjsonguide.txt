@@ -1,0 +1,222 @@
+[
+  {
+    "panel_id": "string",              // Required: Group queries by this panel
+    "metric": "string",                // Required: Prometheus metric name (e.g., node_cpu_seconds_total)
+    "org": "string",                   // Required: Custom label (e.g., org-a)
+    "region": "string",                // Required: Custom label (e.g., us-west)
+
+    "job": "string",                   // Optional: Prometheus job label (e.g., cadvisor, node_exporter)
+    "instance": "string",             // Optional: Regex for instance (e.g., .* or 10.0.0.1:9100)
+    "name_regex": "string",           // Optional: Regex for container/pod name (e.g., .+)
+
+    "use_rate": true,                 // Optional: Whether to wrap the metric with rate() — default: false
+    "window": "5m",                   // Optional: Window for rate(), e.g., "1m", "5m", "1h"
+
+    "agg": "sum",                     // Optional: Aggregation function — sum, avg, max, min, rate, etc.
+    "group_by": "string",             // Optional: Group by this label — e.g., "mode", "name", "instance"
+
+    "multiply": 100,                  // Optional: Multiply final result — often used for converting to %
+
+    "mode": "instant",                // Optional: "instant" or "range" — default is instant
+
+    "start": "2025-07-01T00:00:00Z",  // Required if mode = "range"
+    "end": "2025-07-01T01:00:00Z",    // Required if mode = "range"
+    "step": "30s"                     // Optional: Query step in "range" mode
+  }
+]
+
+
+==================================================================================================================
+
+websocket POST JSON guide 
+
+
+node_exporter :- 
+
+{
+  "type": "init",
+  "dashboard_id": "systemmetrics",
+  "interval": 10,
+  "filters": {
+    "org": "org-a",
+    "region": "us-west",
+    "instance": "10.0.2.126:9100",
+    "job": "node_exporters"
+  },
+  "groups": [
+    {
+      "group_name": "Quick CPU/MEM/DISK",
+      "panels": [
+        {
+          "panel_id": "Pressure",
+          "queries": [
+            {
+              "custom_expression": "irate(node_pressure_cpu_waiting_seconds_total{instance=\"$instance\",job=\"$job\"}[$__rate_interval])"
+            },
+            {
+              "custom_expression": "irate(node_pressure_memory_waiting_seconds_total{instance=\"$instance\",job=\"$job\"}[$__rate_interval])"
+            },
+            {
+              "custom_expression": "irate(node_pressure_io_waiting_seconds_total{instance=\"$instance\",job=\"$job\"}[$__rate_interval])"
+            }
+          ]
+        },
+        {
+          "panel_id": "CPU Usage %",
+          "queries": [
+            {
+              "metric": "node_cpu_seconds_total",
+              "use_rate": true,
+              "window": "5m",
+              "custom_expression": "100 * (1 - avg($base))"
+            }
+          ]
+        },
+        {
+          "panel_id": "Sys Load",
+          "queries": [
+            {
+              "custom_expression": "scalar(node_load1{instance=\"$instance\",job=\"$job\"}) * 100 / count(count(node_cpu_seconds_total{instance=\"$instance\",job=\"$job\"}) by (cpu))"
+            }
+          ]
+        },
+        {
+          "panel_id": "RAM used",
+          "queries": [
+            {
+              "custom_expression": "(1 - (node_memory_MemAvailable_bytes{instance=\"$instance\", job=\"$job\"} / node_memory_MemTotal_bytes{instance=\"$instance\", job=\"$job\"})) * 100"
+            }
+          ]
+        },
+        {
+          "panel_id": "Cpu cores",
+          "queries": [
+            {
+              "custom_expression": "count(count(node_cpu_seconds_total{instance=\"$instance\",job=\"$job\"}) by (cpu))"
+            }
+          ]
+        },
+        {
+          "panel_id": "RAM Total",
+          "queries": [
+            {
+              "metric": "node_memory_MemTotal_bytes"
+            }
+          ]
+        },
+        {
+          "panel_id": "Uptime",
+          "queries": [
+            {
+              "custom_expression": "node_time_seconds{instance=\"$instance\",job=\"$job\"} - node_boot_time_seconds{instance=\"$instance\",job=\"$job\"}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "group_name": "Basic / CPU / MEM / NET / DISK",
+      "panels": [
+        {
+          "panel_id": "CPU Basic",
+          "queries": [
+            {
+              "custom_expression": "sum(irate(node_cpu_seconds_total{instance=\"$instance\",job=\"$job\", mode=\"system\"}[$__rate_interval])) / scalar(count(count(node_cpu_seconds_total{instance=\"$instance\",job=\"$job\"}) by (cpu)))"
+            },
+            {
+              "custom_expression": "sum(irate(node_cpu_seconds_total{instance=\"$instance\",job=\"$job\", mode=\"user\"}[$__rate_interval])) / scalar(count(count(node_cpu_seconds_total{instance=\"$instance\",job=\"$job\"}) by (cpu)))"
+            },
+            {
+              "custom_expression": "sum(irate(node_cpu_seconds_total{instance=\"$instance\",job=\"$job\", mode=\"iowait\"}[$__rate_interval])) / scalar(count(count(node_cpu_seconds_total{instance=\"$instance\",job=\"$job\"}) by (cpu)))"
+            },
+            {
+              "custom_expression": "sum(irate(node_cpu_seconds_total{instance=\"$instance\",job=\"$job\", mode=~\".*irq\"}[$__rate_interval])) / scalar(count(count(node_cpu_seconds_total{instance=\"$instance\",job=\"$job\"}) by (cpu)))"
+            },
+            {
+              "custom_expression": "sum(irate(node_cpu_seconds_total{instance=\"$instance\",job=\"$job\", mode!=\"idle\",mode!=\"user\",mode!=\"system\",mode!=\"iowait\",mode!=\"irq\",mode!=\"softirq\"}[$__rate_interval])) / scalar(count(count(node_cpu_seconds_total{instance=\"$instance\",job=\"$job\"}) by (cpu)))"
+            },
+            {
+              "custom_expression": "sum(irate(node_cpu_seconds_total{instance=\"$instance\",job=\"$job\", mode=\"idle\"}[$__rate_interval])) / scalar(count(count(node_cpu_seconds_total{instance=\"$instance\",job=\"$job\"}) by (cpu)))"
+            }
+          ]
+        },
+        {
+          "panel_id": "Memory Basic",
+          "queries": [
+            {
+              "custom_expression": "node_memory_MemTotal_bytes{instance=\"$instance\",job=\"$job\"}"
+            },
+            {
+              "custom_expression": "node_memory_MemTotal_bytes{instance=\"$instance\",job=\"$job\"} - node_memory_MemFree_bytes{instance=\"$instance\",job=\"$job\"} - (node_memory_Cached_bytes{instance=\"$instance\",job=\"$job\"} + node_memory_Buffers_bytes{instance=\"$instance\",job=\"$job\"} + node_memory_SReclaimable_bytes{instance=\"$instance\",job=\"$job\"})"
+            },
+            {
+              "custom_expression": "node_memory_Cached_bytes{instance=\"$instance\",job=\"$job\"} + node_memory_Buffers_bytes{instance=\"$instance\",job=\"$job\"} + node_memory_SReclaimable_bytes{instance=\"$instance\",job=\"$job\"}"
+            },
+            {
+              "custom_expression": "node_memory_MemFree_bytes{instance=\"$instance\",job=\"$job\"}"
+            },
+            {
+              "custom_expression": "node_memory_SwapTotal_bytes{instance=\"$instance\",job=\"$job\"} - node_memory_SwapFree_bytes{instance=\"$instance\",job=\"$job\"}"
+            }
+          ]
+        },
+        {
+          "panel_id": "Network Traffic Basic",
+          "queries": [
+            {
+              "custom_expression": "rate(node_network_receive_bytes_total{instance=\"$instance\",job=\"$job\"}[$__rate_interval])*8"
+            },
+            {
+              "custom_expression": "rate(node_network_transmit_bytes_total{instance=\"$instance\",job=\"$job\"}[$__rate_interval])*8"
+            }
+          ]
+        },
+        {
+          "panel_id": "Disk Space Used Basic",
+          "queries": [
+            {
+              "custom_expression": "((node_filesystem_size_bytes{instance=\"$instance\", job=\"$job\", device!~\"rootfs\"} - node_filesystem_avail_bytes{instance=\"$instance\", job=\"$job\", device!~\"rootfs\"}) / node_filesystem_size_bytes{instance=\"$instance\", job=\"$job\", device!~\"rootfs\"}) * 100"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+
+
+========================================================================
+
+
+{
+  "dashboard_id": "cadvaiser",
+  "interval": 10,
+  "filters": {
+    "org": "org-a",
+    "region": "us-west",
+    "instance": ".*",  
+    "job": "cadvisor",
+    "name_regex": ".*"  
+  },
+  "panels": [
+    {
+      "panel_id": "CPU_Usage",
+      "panel_name": "CPU Usage",
+      "queries": [
+        {
+          "metric": "container_cpu_usage_seconds_total",
+          "use_rate": true,
+          "window": "5m",
+          "group_by": "name",
+          "custom_expression": "sum($base) by (name) * 100"
+        }
+      ]
+    }
+  ]
+}
+
+
+
+
+
+

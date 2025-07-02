@@ -1,0 +1,151 @@
+Here is the complete guide to the **WebSocket JSON payload** structure for your `/ws/metrics/dashboard` API — with **all keys and values explained** clearly.
+
+---
+
+## ✅ WebSocket Dashboard Payload (Client → Server)
+
+### 📌 Format: Initial Message (type = `init`)
+
+```json
+{
+  "type": "init",
+  "dashboard_id": "infra_dashboard_1",
+  "interval": 10,
+  "filters": {
+    "org": "org-a",
+    "region": "us-west",
+    "job": "node_exporters",
+    "instance": "10.0.2.126:9100"
+  },
+  "panels": [
+    {
+      "panel_id": "cpu_panel",
+      "queries": [
+        {
+          "metric": "node_cpu_seconds_total",
+          "group_by": "mode",
+          "use_rate": true,
+          "window": "5m",
+          "agg": "sum",
+          "multiply": 100
+        }
+      ]
+    },
+    {
+      "panel_id": "mem_panel",
+      "queries": [
+        {
+          "metric": "node_memory_MemAvailable_bytes",
+          "agg": "sum"
+        },
+        {
+          "metric": "node_memory_MemTotal_bytes",
+          "agg": "sum"
+        }
+      ]
+    }
+  ]
+}
+```
+
+---
+
+## 🔑 Key-by-Key Explanation
+
+### 🧾 Top-Level Payload Keys
+
+| Key            | Type     | Description                                                          |
+| -------------- | -------- | -------------------------------------------------------------------- |
+| `type`         | `string` | Must be `"init"` on the first message.                               |
+| `dashboard_id` | `string` | A unique identifier for the dashboard (e.g., `"infra_dashboard_1"`). |
+| `interval`     | `int`    | Time in seconds between automatic updates (e.g., `10` seconds).      |
+| `filters`      | `object` | Global filters applied to all panel queries (see below).             |
+| `panels`       | `array`  | List of dashboard panels and the queries they run.                   |
+
+---
+
+### 🗂 Filters Block (`filters`)
+
+These apply to **all queries** in all panels.
+
+| Key        | Type     | Description                                           |
+| ---------- | -------- | ----------------------------------------------------- |
+| `org`      | `string` | Filter by org label (e.g., `"org-a"`).                |
+| `region`   | `string` | Filter by region label (e.g., `"us-west"`).           |
+| `job`      | `string` | (Optional) Filter by Prometheus job name.             |
+| `instance` | `string` | (Optional) Regex match for exporter instance address. |
+
+---
+
+### 🧩 Panels Block (`panels[]`)
+
+Each item represents a dashboard panel.
+
+| Key        | Type   | Description                                      |
+| ---------- | ------ | ------------------------------------------------ |
+| `panel_id` | string | Unique ID for the panel (e.g., `"cpu_panel"`).   |
+| `queries`  | array  | List of Prometheus query configs for this panel. |
+
+---
+
+### 📈 Query Definition (`queries[]`)
+
+Each query block supports these fields:
+
+| Key          | Type     | Description                                                             |
+| ------------ | -------- | ----------------------------------------------------------------------- |
+| `metric`     | `string` | Prometheus metric name (required).                                      |
+| `group_by`   | `string` | (Optional) Group by this label (e.g., `"mode"`, `"name"`).              |
+| `use_rate`   | `bool`   | Whether to wrap the metric in `rate()` or `irate()`.                    |
+| `window`     | `string` | (Default: `"5m"`) Time window used in `rate()` (e.g., `"1m"`, `"10m"`). |
+| `agg`        | `string` | (Optional) Aggregation function like `sum`, `avg`, `min`, `max`, etc.   |
+| `multiply`   | `int`    | (Optional) Multiply the final result (e.g., 100 for percent).           |
+| `name_regex` | `string` | (Optional) Regex to filter on `name` label (e.g., `".+"`).              |
+
+---
+
+## 🔁 Update Filters Payload (Client → Server)
+
+If user changes filters on the dashboard UI:
+
+```json
+{
+  "type": "update_filters",
+  "filters": {
+    "org": "org-a",
+    "region": "us-west",
+    "job": "cadvisor",
+    "instance": "10.0.2.126:8080",
+    "env": "prod",
+    "name_regex": "nginx|redis"
+  }
+}
+```
+
+Server will apply this to all future PromQL builds and return updated panel values.
+
+---
+
+## 📤 Server → Client Response Format
+
+```json
+{
+  "timestamp": 1751395193,
+  "dashboard_id": "infra_dashboard_1",
+  "results": [
+    {
+      "panel_id": "cpu_panel",
+      "queries": [
+        {
+          "promql": "sum(rate(node_cpu_seconds_total{...}[5m])) by (mode) * 100",
+          "data": {...}  // Victoria response
+        }
+      ]
+    },
+    ...
+  ]
+}
+```
+
+---
+
