@@ -14,14 +14,16 @@ app = FastAPI()
 # Base VictoriaMetrics URL
 VICTORIA_BASE_URL = "http://34.131.24.129:8428"
 
+def match_operator(value: str) -> str:
+    return "=~" if ".*" in value else "="
 
 # ------------------------------------------------
 # Helper: Build dynamic PromQL with filter options
 # ------------------------------------------------
 def build_advanced_promql(
     metric: str,
-    org: str,
-    region: str,
+    orgid: str,
+    anchorid: str,
     instance: Optional[str],
     name_regex: Optional[str],
     job: Optional[str],
@@ -33,13 +35,16 @@ def build_advanced_promql(
     custom_expression: Optional[str] = None,
     filters: Optional[dict] = None
 ) -> str:
-    labels = [f'org="{org}"', f'region="{region}"']
+    labels = [
+        f'orgid{match_operator(orgid)}"{orgid}"',
+        f'anchorid{match_operator(anchorid)}"{anchorid}"'
+    ]
     if instance:
-        labels.append(f'instance=~"{instance}"')
+        labels.append(f'instance{match_operator(instance)}"{instance}"')
     if name_regex:
-        labels.append(f'name=~"{name_regex}"')
+        labels.append(f'name{match_operator(name_regex)}"{name_regex}"')
     if job:
-        labels.append(f'job="{job}"')
+        labels.append(f'job{match_operator(job)}"{job}"')
 
     label_str = ",".join(labels)
     base = f"{metric}{{{label_str}}}" if label_str else metric
@@ -54,16 +59,20 @@ def build_advanced_promql(
             base = f"{agg}({base})"
 
     if custom_expression:
-        # Replace all filters from config
+        # Replace dynamic labels in custom_expression with correct match ops
         for k, v in (filters or {}).items():
-            custom_expression = custom_expression.replace(f"${k}", str(v))
+            if k in ["anchorid", "orgid", "instance", "job", "name_regex"]:
+                op = match_operator(str(v))
+                custom_expression = custom_expression.replace(f'{k}="${k}"', f'{k}{op}"{v}"')
+                custom_expression = custom_expression.replace(f"${k}", str(v))
+            else:
+                custom_expression = custom_expression.replace(f"${k}", str(v))
         base = custom_expression.replace("$base", base)
 
     if multiply:
         base = f"{base} * {multiply}"
 
     return base
-
 
 def query(promql: str) -> dict:
     url = f"{VICTORIA_BASE_URL}/api/v1/query?query={quote(promql)}"
@@ -73,24 +82,15 @@ def query(promql: str) -> dict:
 # ------------------------------------------------
 # Helper: Query VictoriaMetrics (instant/range)
 # ------------------------------------------------
-def query_prometheus(promql: str, mode: str, start: Optional[str] = None, end: Optional[str] = None, step: Optional[str] = "60s") -> dict:
-    encoded = quote(promql)
-
+def query_prometheus(promql: str, mode: str, start: Optional[str] = None, end: Optional[str] = None, step: str = "60s") -> dict:
     if mode == "range":
         if not start or not end:
-            raise HTTPException(status_code=422, detail="start and end time required for range queries")
-
+            raise HTTPException(status_code=422, detail="start and end time required")
+        params = {"query": promql, "start": start, "end": end, "step": step}
         url = f"{VICTORIA_BASE_URL}/api/v1/query_range"
-        params = {
-            "query": promql,
-            "start": start,
-            "end": end,
-            "step": step
-        }
     else:
-        url = f"{VICTORIA_BASE_URL}/api/v1/query"
         params = {"query": promql}
-
+        url = f"{VICTORIA_BASE_URL}/api/v1/query"
     response = requests.get(url, params=params)
     response.raise_for_status()
     return response.json()
@@ -101,8 +101,8 @@ def query_prometheus(promql: str, mode: str, start: Optional[str] = None, end: O
 @app.get("/metrics/query")
 def dynamic_metrics_query(
     metric: str = Query(..., description="Prometheus metric name"),
-    org: str = Query(..., description="Org label (required)"),
-    region: str = Query(..., description="Region label (required)"),
+    orgid: str = Query(..., description="orgid label (required)"),
+    anchorid: str = Query(..., description="anchorid label (required)"),
     job: Optional[str] = Query(None, description="Job label filter"),
     instance: Optional[str] = Query(None, description="Instance filter"),
     name_regex: Optional[str] = Query(None, description="Regex for container or pod name"),
@@ -118,7 +118,7 @@ def dynamic_metrics_query(
 ):
     try:
         promql = build_advanced_promql(
-            metric, org, region, instance, name_regex, job,
+            metric, orgid, anchorid, instance, name_regex, job,
             use_rate, window, agg, group_by, multiply
         )
         data = query_prometheus(promql, mode, start, end, step)
@@ -126,8 +126,8 @@ def dynamic_metrics_query(
         return {
             "filters_used": {
                 "metric": metric,
-                "org": org,
-                "region": region,
+                "orgid": orgid,
+                "anchorid": anchorid,
                 "job": job,
                 "instance": instance,
                 "name_regex": name_regex,
@@ -149,22 +149,22 @@ def dynamic_metrics_query(
 
 @app.get("/metrics/status")
 def get_job_status(
-    org: str = Query(..., description="Organization label"),
-    region: Optional[str] = Query(None, description="Region label (optional, omit to fetch all regions)"),
+    orgid: str = Query(..., description="Organization label"),
+    anchorid: Optional[str] = Query(None, description="anchorid label (optional, omit to fetch all anchorid)"),
     job: Optional[str] = Query(None),
     instance: Optional[str] = Query(None),
     env: Optional[str] = Query(None),
     status_filter: Optional[str] = Query("all", description="Filter by status: up, down, or all")
 ):
     # --- Label Filtering Logic ---
-    labels = [f'org="{org}"']
+    labels = [f'orgid="{orgid}"']
 
-    if region:
+    if anchorid:
         # Regex or literal
-        if "*" in region or "." in region or region.startswith("("):
-            labels.append(f'region=~"{region}"')
+        if "*" in anchorid or "." in anchorid or anchorid.startswith("("):
+            labels.append(f'anchorid=~"{anchorid}"')
         else:
-            labels.append(f'region="{region}"')
+            labels.append(f'anchorid="{anchorid}"')
 
     if job:
         labels.append(f'job="{job}"')
@@ -186,16 +186,16 @@ def get_job_status(
         raise HTTPException(status_code=500, detail="Invalid JSON from VictoriaMetrics")
 
     result = {}
-    region_set = set()
+    anchorid_set = set()
 
     for item in data.get("data", {}).get("result", []):
         metric = item.get("metric", {})
         job_label = metric.get("job", "unknown")
         instance_label = metric.get("instance", "unknown")
-        region_label = metric.get("region", "unknown")
+        anchorid_label = metric.get("anchorid", "unknown")
         status = item.get("value", [])[1]
 
-        region_set.add(region_label)
+        anchorid_set.add(anchorid_label)
 
         if job_label not in result:
             result[job_label] = {"up": [], "down": []}
@@ -216,12 +216,12 @@ def get_job_status(
     # --- Optional: Fetch containers per instance if job is cadvisor ---
     container_names = {}
     if job == "cadvisor":
-        container_labels = [f'org="{org}"']
-        if region:
-            if "*" in region or "." in region or region.startswith("("):
-                container_labels.append(f'region=~"{region}"')
+        container_labels = [f'orgid="{orgid}"']
+        if anchorid:
+            if "*" in anchorid or "." in anchorid or anchorid.startswith("("):
+                container_labels.append(f'anchorid=~"{anchorid}"')
             else:
-                container_labels.append(f'region="{region}"')
+                container_labels.append(f'anchorid="{anchorid}"')
         if instance:
             container_labels.append(f'instance=~"{instance}"')
         container_labels.append('job="cadvisor"')
@@ -253,15 +253,15 @@ def get_job_status(
     # --- Final Response ---
     return {
         "filters": {
-            "org": org,
-            "region": region,
+            "orgid": orgid,
+            "anchorid": anchorid,
             "job": job,
             "instance": instance,
             "env": env,
             "status_filter": status_filter
         },
         "query": promql,
-        "matched_regions": sorted(list(region_set)),
+        "matched_anchorid": sorted(list(anchorid_set)),
         "jobs": result,
         "containers": container_names if job == "cadvisor" else {}
     }
@@ -269,12 +269,12 @@ def get_job_status(
 
 @app.get("/metrics/list")
 def list_metrics(
-    org: str = Query(...),
-    region: str = Query(...),
+    orgid: str = Query(...),
+    anchorid: str = Query(...),
     job: Optional[str] = Query(None),
     instance: Optional[str] = Query(None)
 ):
-    labels = [f'org="{org}"', f'region="{region}"']
+    labels = [f'orgid="{orgid}"', f'anchorid="{anchorid}"']
     if job:
         labels.append(f'job="{job}"')
     if instance:
@@ -295,8 +295,8 @@ def list_metrics(
 
         return {
             "filters": {
-                "org": org,
-                "region": region,
+                "orgid": orgid,
+                "anchorid": anchorid,
                 "job": job,
                 "instance": instance
             },
@@ -313,8 +313,8 @@ async def websocket_metrics_query(websocket: WebSocket):
     try:
         payload = await websocket.receive_json()
         metric = payload.get("metric")
-        org = payload.get("org")
-        region = payload.get("region")
+        orgid = payload.get("orgid")
+        anchorid = payload.get("anchorid")
         instance = payload.get("instance")
         name_regex = payload.get("name_regex")
         job = payload.get("job")
@@ -327,7 +327,7 @@ async def websocket_metrics_query(websocket: WebSocket):
         mode = payload.get("mode", "instant")
 
         promql = build_advanced_promql(
-            metric, org, region, instance, name_regex, job, use_rate, window, agg, group_by, multiply
+            metric, orgid, anchorid, instance, name_regex, job, use_rate, window, agg, group_by, multiply
         )
 
         while True:
@@ -348,8 +348,8 @@ async def websocket_metrics_query(websocket: WebSocket):
 class MetricQuery(BaseModel):
     panel_id: str
     metric: str
-    org: str
-    region: str
+    orgid: str
+    anchorid: str
     job: Optional[str] = None
     instance: Optional[str] = None
     name_regex: Optional[str] = None
@@ -364,31 +364,6 @@ class MetricQuery(BaseModel):
     step: Optional[str] = "60s"
 
 
-#@app.post("/metrics/dashboard")
-async def dashboard_metrics(queries: List[MetricQuery]):
-    response = {}
-
-    for q in queries:
-        try:
-            promql = build_advanced_promql(
-                q.metric, q.org, q.region, q.instance, q.name_regex,
-                q.job, q.use_rate, q.window, q.agg, q.group_by, q.multiply
-            )
-            data = query_prometheus(promql, q.mode, q.start, q.end, q.step)
-            response.setdefault(q.panel_id, []).append({
-                "query": promql,
-                "result": data.get("data", {})
-            })
-        except Exception as e:
-            response.setdefault(q.panel_id, []).append({"error": str(e)})
-
-    return response
-
-def query(promql: str) -> dict:
-    url = f"{VICTORIA_BASE_URL}/api/v1/query?query={quote(promql)}"
-    res = requests.get(url)
-    return res.json()
-
 @app.websocket("/ws/metrics/dashboard")
 async def websocket_dashboard(websocket: WebSocket):
     await websocket.accept()
@@ -400,57 +375,33 @@ async def websocket_dashboard(websocket: WebSocket):
     }
 
     try:
-        init_data = await websocket.receive_json()
-        config["dashboard_id"] = init_data.get("dashboard_id")
-        config["interval"] = init_data.get("interval", 10)
-        config["filters"] = init_data.get("filters", {})
-        config["groups"] = init_data.get("groups", [])
-
-        print(f"[WebSocket Connected] Dashboard: {config['dashboard_id']}")
-
         while True:
+            # Non-blocking receive for init/update messages
             try:
-                incoming = await asyncio.wait_for(websocket.receive_json(), timeout=0.1)
+                message = await asyncio.wait_for(websocket.receive_json(), timeout=0.1)
+                msg_type = message.get("type")
 
-                if incoming.get("type") == "update_filters":
-                    new_filters = incoming.get("filters", {})
-                    if isinstance(new_filters, dict):
-                        config["filters"].update(new_filters)
-                        await websocket.send_text(json.dumps({
-                            "type": "filter_ack",
-                            "message": "Filters updated",
-                            "updated_filters": config["filters"],
-                            "timestamp": int(time.time()),
-                            "iso_timestamp": datetime.datetime.utcnow().isoformat() + "Z"
-                        }))
-                    else:
-                        await websocket.send_text(json.dumps({
-                            "type": "error",
-                            "message": "Invalid filters format"
-                        }))
-                elif incoming.get("type") == "update_interval":
-                    new_interval = incoming.get("interval")
-                    if isinstance(new_interval, int) and new_interval > 0:
-                        config["interval"] = new_interval
-                        await websocket.send_text(json.dumps({
-                            "type": "interval_ack",
-                            "message": f"Interval updated to {new_interval} seconds",
-                            "interval": new_interval,
-                            "timestamp": int(time.time())
-                        }))
-                    else:
-                        await websocket.send_text(json.dumps({
-                            "type": "error",
-                            "message": "Invalid interval value"
-                        }))
+                if msg_type == "init":
+                    config.update({
+                        "dashboard_id": message.get("dashboard_id"),
+                        "interval": message.get("interval", 10),
+                        "filters": message.get("filters", {}),
+                        "groups": message.get("groups", [])
+                    })
+
+                elif msg_type == "update_filters":
+                    if "filters" in message:
+                        config["filters"].update(message["filters"])
+                    if "interval" in message:
+                        config["interval"] = message["interval"]
 
             except asyncio.TimeoutError:
-                pass
-            except json.JSONDecodeError:
-                await websocket.send_text(json.dumps({"error": "Invalid JSON format"}))
-                continue
+                pass  # No update message, continue streaming
 
-            now_ts = int(time.time())
+            # --- Start time to measure query+build duration ---
+            start_time = time.time()
+
+            now_ts = int(start_time)
             now_iso = datetime.datetime.utcfromtimestamp(now_ts).isoformat() + "Z"
             full_response = {
                 "timestamp": now_ts,
@@ -459,65 +410,47 @@ async def websocket_dashboard(websocket: WebSocket):
                 "results": []
             }
 
+            # Loop through groups and panels
             for group in config["groups"]:
-                group_name = group.get("group_name")
-                panels = group.get("panels", [])
-                group_result = {"group_name": group_name, "panels": []}
+                group_result = {"group_name": group.get("group_name"), "panels": []}
 
-                for panel in panels:
-                    panel_id = panel.get("panel_id")
-                    queries = panel.get("queries", [])
-                    panel_result = {"panel_id": panel_id, "queries": []}
+                for panel in group.get("panels", []):
+                    panel_result = {"panel_id": panel.get("panel_id"), "queries": []}
 
-                    for query_def in queries:
+                    for q in panel.get("queries", []):
                         try:
                             promql = build_advanced_promql(
-                                query_def.get("metric"),
-                                config["filters"].get("org"),
-                                config["filters"].get("region"),
+                                q.get("metric"),
+                                config["filters"].get("orgid", ""),
+                                config["filters"].get("anchorid", ""),
                                 config["filters"].get("instance"),
                                 config["filters"].get("name_regex"),
                                 config["filters"].get("job"),
-                                query_def.get("use_rate", False),
-                                query_def.get("window", "5m"),
-                                query_def.get("agg", "sum"),
-                                query_def.get("group_by"),
-                                query_def.get("multiply"),
-                                query_def.get("custom_expression"),
+                                q.get("use_rate", False),
+                                q.get("window", "5m"),
+                                q.get("agg", "sum"),
+                                q.get("group_by"),
+                                q.get("multiply"),
+                                q.get("custom_expression"),
                                 config["filters"]
                             )
-
                             result = query(promql)
-
-                            for metric_result in result.get("data", {}).get("result", []):
-                                value = metric_result.get("value")
-                                if isinstance(value, list) and len(value) >= 1:
-                                    try:
-                                        ts = int(float(value[0]))
-                                        iso_ts = datetime.datetime.utcfromtimestamp(ts).isoformat() + "Z"
-                                        metric_result["iso_timestamp"] = iso_ts
-                                    except Exception:
-                                        metric_result["iso_timestamp"] = None
-
-                            panel_result["queries"].append({
-                                "promql": promql,
-                                "data": result.get("data", {})
-                            })
-
+                            panel_result["queries"].append({"promql": promql, "data": result.get("data", {})})
                         except Exception as e:
-                            panel_result["queries"].append({
-                                "promql": None,
-                                "error": str(e)
-                            })
+                            panel_result["queries"].append({"promql": None, "error": str(e)})
 
                     group_result["panels"].append(panel_result)
 
                 full_response["results"].append(group_result)
 
             await websocket.send_text(json.dumps(full_response))
-            await asyncio.sleep(config["interval"])
+
+            # --- Accurate interval wait ---
+            elapsed = time.time() - start_time
+            delay = max(0, config["interval"] - elapsed)
+            await asyncio.sleep(delay)
 
     except WebSocketDisconnect:
-        print(f"[WebSocket Disconnected] Dashboard: {config['dashboard_id']}")
+        print(f"Dashboard disconnected: {config['dashboard_id']}")
     except Exception as e:
         await websocket.send_text(json.dumps({"type": "error", "message": str(e)}))
