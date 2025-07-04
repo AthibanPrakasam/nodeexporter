@@ -17,9 +17,6 @@ VICTORIA_BASE_URL = "http://34.131.24.129:8428"
 def match_operator(value: str) -> str:
     return "=~" if ".*" in value else "="
 
-# ------------------------------------------------
-# Helper: Build dynamic PromQL with filter options
-# ------------------------------------------------
 def build_advanced_promql(
     metric: str,
     orgid: str,
@@ -59,29 +56,46 @@ def build_advanced_promql(
             base = f"{agg}({base})"
 
     if custom_expression:
-        # Replace dynamic labels in custom_expression with correct match ops
+        custom_expression = custom_expression.replace("$__rate_interval", window)
         for k, v in (filters or {}).items():
             if k in ["anchorid", "orgid", "instance", "job", "name_regex"]:
                 op = match_operator(str(v))
-                custom_expression = custom_expression.replace(f'{k}="${k}"', f'{k}{op}"{v}"')
+                custom_expression = custom_expression.replace(f'{k}="$' + f'{k}"', f'{k}{op}"{v}"')
                 custom_expression = custom_expression.replace(f"${k}", str(v))
             else:
                 custom_expression = custom_expression.replace(f"${k}", str(v))
         base = custom_expression.replace("$base", base)
 
+        if "up{" in base and "or on(instance) vector(0)" not in base:
+            base = f"({base}) or on(instance) vector(0)"
+        elif "* on(instance) group_left up{" in base and "or on(instance) vector(0)" not in base:
+            base = f"({base}) or on(instance) vector(0)"
+
     if multiply:
         base = f"{base} * {multiply}"
 
+    if "[30s]" in base or "[5m]" in base:
+        now = int(time.time())
+        base += f" @{now}"
+
     return base
+
+@app.get("/time")
+def get_time():
+    now_ts = int(time.time())
+    now_utc = datetime.datetime.utcfromtimestamp(now_ts).isoformat() + "Z"
+    now_ist = datetime.datetime.fromtimestamp(now_ts + 19800).strftime("%Y-%m-%d %H:%M:%S IST")
+    return {
+        "timestamp": now_ts,
+        "utc": now_utc,
+        "ist": now_ist
+    }
 
 def query(promql: str) -> dict:
     url = f"{VICTORIA_BASE_URL}/api/v1/query?query={quote(promql)}"
     res = requests.get(url)
     return res.json()
 
-# ------------------------------------------------
-# Helper: Query VictoriaMetrics (instant/range)
-# ------------------------------------------------
 def query_prometheus(promql: str, mode: str, start: Optional[str] = None, end: Optional[str] = None, step: str = "60s") -> dict:
     if mode == "range":
         if not start or not end:
@@ -93,7 +107,17 @@ def query_prometheus(promql: str, mode: str, start: Optional[str] = None, end: O
         url = f"{VICTORIA_BASE_URL}/api/v1/query"
     response = requests.get(url, params=params)
     response.raise_for_status()
-    return response.json()
+    data = response.json()
+
+    # Optional check for freshness (only for instant queries)
+    if mode == "instant" and data.get("data", {}).get("result"):
+        now = int(time.time())
+        ts = int(float(data["data"]["result"][0]["value"][0]))
+        if abs(now - ts) > 60:
+            # Treat as stale
+            data["data"]["result"] = []
+
+    return data
 
 # ------------------------------------------------
 # ✅ Unified Metrics Query API
@@ -367,20 +391,14 @@ class MetricQuery(BaseModel):
 @app.websocket("/ws/metrics/dashboard")
 async def websocket_dashboard(websocket: WebSocket):
     await websocket.accept()
-    config = {
-        "dashboard_id": None,
-        "interval": 10,
-        "filters": {},
-        "groups": []
-    }
+    config = {"dashboard_id": None, "interval": 10, "filters": {}, "groups": []}
+    last_up_time = {}
 
     try:
         while True:
-            # Non-blocking receive for init/update messages
             try:
                 message = await asyncio.wait_for(websocket.receive_json(), timeout=0.1)
                 msg_type = message.get("type")
-
                 if msg_type == "init":
                     config.update({
                         "dashboard_id": message.get("dashboard_id"),
@@ -388,21 +406,18 @@ async def websocket_dashboard(websocket: WebSocket):
                         "filters": message.get("filters", {}),
                         "groups": message.get("groups", [])
                     })
-
                 elif msg_type == "update_filters":
                     if "filters" in message:
                         config["filters"].update(message["filters"])
                     if "interval" in message:
                         config["interval"] = message["interval"]
-
             except asyncio.TimeoutError:
-                pass  # No update message, continue streaming
+                pass  # no message, continue
 
-            # --- Start time to measure query+build duration ---
             start_time = time.time()
-
             now_ts = int(start_time)
             now_iso = datetime.datetime.utcfromtimestamp(now_ts).isoformat() + "Z"
+
             full_response = {
                 "timestamp": now_ts,
                 "timestamp_iso": now_iso,
@@ -410,14 +425,13 @@ async def websocket_dashboard(websocket: WebSocket):
                 "results": []
             }
 
-            # Loop through groups and panels
             for group in config["groups"]:
                 group_result = {"group_name": group.get("group_name"), "panels": []}
-
                 for panel in group.get("panels", []):
-                    panel_result = {"panel_id": panel.get("panel_id"), "queries": []}
+                    panel_id = panel.get("panel_id")
+                    panel_result = {"panel_id": panel_id, "queries": []}
 
-                    for q in panel.get("queries", []):
+                    for idx, q in enumerate(panel.get("queries", [])):
                         try:
                             promql = build_advanced_promql(
                                 q.get("metric"),
@@ -434,18 +448,47 @@ async def websocket_dashboard(websocket: WebSocket):
                                 q.get("custom_expression"),
                                 config["filters"]
                             )
+
                             result = query(promql)
-                            panel_result["queries"].append({"promql": promql, "data": result.get("data", {})})
+                            result_data = result.get("data", {})
+                            result_list = result_data.get("result", [])
+
+                            # ---- Staleness check: treat result as stale if timestamp is >60s old
+                            if result_list:
+                                try:
+                                    ts = float(result_list[0]["value"][0])
+                                    if now_ts - ts > 60:
+                                        result_list = []
+                                        result_data["result"] = []
+                                except Exception as e:
+                                    print(f"[Warning] Failed staleness check: {e}")
+
+                            query_key = f"{config['dashboard_id']}::{panel_id}::{idx}"
+                            if result_list:
+                                status = "up"
+                                last_up_time[query_key] = now_iso
+                            else:
+                                status = "down"
+
+                            panel_result["queries"].append({
+                                "promql": promql,
+                                "data": result_data,
+                                "status": status,
+                                "last_seen_up": last_up_time.get(query_key)
+                            })
+
                         except Exception as e:
-                            panel_result["queries"].append({"promql": None, "error": str(e)})
+                            panel_result["queries"].append({
+                                "promql": None,
+                                "error": str(e),
+                                "status": "error"
+                            })
 
                     group_result["panels"].append(panel_result)
-
                 full_response["results"].append(group_result)
 
             await websocket.send_text(json.dumps(full_response))
 
-            # --- Accurate interval wait ---
             elapsed = time.time() - start_time
             delay = max(0, config["interval"] - elapsed)
             await asyncio.sleep(delay)
@@ -453,4 +496,7 @@ async def websocket_dashboard(websocket: WebSocket):
     except WebSocketDisconnect:
         print(f"Dashboard disconnected: {config['dashboard_id']}")
     except Exception as e:
-        await websocket.send_text(json.dumps({"type": "error", "message": str(e)}))
+        await websocket.send_text(json.dumps({
+            "type": "error",
+            "message": str(e)
+        }))
