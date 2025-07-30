@@ -29,13 +29,13 @@
           "panel_id": "Pressure",
           "queries": [
             {
-              "custom_expression": "irate(node_pressure_cpu_waiting_seconds_total{instance=\"$instance\",job=\"$job\",orgid=\"$orgid\",anchorid=\"$anchorid\"}[30s])"
+              "custom_expression": "irate(node_pressure_cpu_waiting_seconds_total{instance=\"$instance\",job=\"$job\",orgid=\"$orgid\",anchorid=\"$anchorid\"}[5m])"
             },
             {
-              "custom_expression": "irate(node_pressure_memory_waiting_seconds_total{instance=\"$instance\",job=\"$job\",orgid=\"$orgid\",anchorid=\"$anchorid\"}[30s])"
+              "custom_expression": "irate(node_pressure_memory_waiting_seconds_total{instance=\"$instance\",job=\"$job\",orgid=\"$orgid\",anchorid=\"$anchorid\"}[5m])"
             },
             {
-              "custom_expression": "irate(node_pressure_io_waiting_seconds_total{instance=\"$instance\",job=\"$job\",orgid=\"$orgid\",anchorid=\"$anchorid\"}[30s])"
+              "custom_expression": "irate(node_pressure_io_waiting_seconds_total{instance=\"$instance\",job=\"$job\",orgid=\"$orgid\",anchorid=\"$anchorid\"}[5m])"
             }
           ]
         },
@@ -43,7 +43,7 @@
           "panel_id": "CPU Usage %",
           "queries": [
             {
-              "custom_expression": "100 * (1 - avg(sum(irate(node_cpu_seconds_total{orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",job=\"$job\"}[30s]))))"
+              "custom_expression": "100 * (1 - avg(sum(irate(node_cpu_seconds_total{orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",job=\"$job\"}[5m]))))"
             }
           ]
         },
@@ -236,10 +236,361 @@
       ]
     }
   ]
-}
-
+},
+{
+  "group_name": "Network Traffic",
+  "panels": [
+    {
+      "panel_id": "Network Traffic by Packets",
+      "queries": [
+        {
+          "custom_expression": "rate(node_network_receive_packets_total{instance=\"$instance\", job=\"$job\", orgid=\"$orgid\", anchorid=\"$anchorid\"}[30s])"
+        },
+        {
+          "custom_expression": "rate(node_network_transmit_packets_total{instance=\"$instance\", job=\"$job\", orgid=\"$orgid\", anchorid=\"$anchorid\"}[30s])"
+        }
+      ]
+    },
+    {
+      "panel_id": "Network Traffic errors",
+      "queries": [
+        {
+          "custom_expression": "rate(node_network_receive_errs_total{instance=\"$instance\", job=\"$job\", orgid=\"$orgid\", anchorid=\"$anchorid\"}[1m])"
+        },
+        {
+          "custom_expression": "rate(node_network_transmit_errs_total{instance=\"$instance\", job=\"$job\", orgid=\"$orgid\", anchorid=\"$anchorid\"}[1m])"
+        }
+      ]
+    },
+    {
+      "panel_id": "Network Traffic Drop",
+      "queries": [
+        {
+          "custom_expression": "rate(node_network_receive_drop_total{instance=\"$instance\", job=\"$job\", orgid=\"$orgid\", anchorid=\"$anchorid\"}[30s])"
+        },
+        {
+          "custom_expression": "rate(node_network_transmit_drop_total{instance=\"$instance\", job=\"$job\", orgid=\"$orgid\", anchorid=\"$anchorid\"}[30s])"
+        }
+      ]
+    },
+    {
+      "panel_id": "Network Traffic Compressed",
+      "queries": [
+        {
+          "custom_expression": "rate(node_network_receive_compressed_total{instance=\"$instance\", job=\"$job\", orgid=\"$orgid\", anchorid=\"$anchorid\"}[30s])"
+        },
+        {
+          "custom_expression": "rate(node_network_transmit_compressed_total{instance=\"$instance\", job=\"$job\", orgid=\"$orgid\", anchorid=\"$anchorid\"}[30s])"
+        }
+      ]
+    },
+    {
+      "panel_id": "Network Traffic Multicast",
+      "queries": [
+        {
+          "custom_expression": "rate(node_network_receive_multicast_total{instance=\"$instance\", job=\"$job\", orgid=\"$orgid\", anchorid=\"$anchorid\"}[30s])"
+        }
+      ]
+    },
+    {
+      "panel_id": "Network Traffic NoHandler",
+      "queries": [
+        {
+          "custom_expression": "rate(node_network_receive_nohandler_total{instance=\"$instance\", job=\"$job\", orgid=\"$orgid\", anchorid=\"$anchorid\"}[30s])"
+        }
+      ]
+    },
+    {
+      "panel_id": "Network Traffic Frame",
+      "queries": [
+        {
+          "custom_expression": "rate(node_network_receive_frame_total{instance=\"$instance\", job=\"$job\", orgid=\"$orgid\", anchorid=\"$anchorid\"}[30s])"
+        }
+      ]
+    },
+    {
+      "panel_id": "Network Traffic Fifo",
+      "queries": [
+        {
+          "custom_expression": "rate(node_network_receive_fifo_total{instance=\"$instance\", job=\"$job\", orgid=\"$orgid\", anchorid=\"$anchorid\"}[30s])"
+        },
+        {
+          "custom_expression": "rate(node_network_transmit_fifo_total{instance=\"$instance\", job=\"$job\", orgid=\"$orgid\", anchorid=\"$anchorid\"}[30s])"
+        }
+      ]
+    },
+    {
+      "panel_id": "Network Traffic Collision",
+      "queries": [
+        {
+          "custom_expression": "rate(node_network_transmit_colls_total{instance=\"$instance\", job=\"$job\", orgid=\"$orgid\", anchorid=\"$anchorid\"}[30s])"
+        }
+      ]
+    },
+    {
+      "panel_id": "Network Traffic Carrier errors",
+      "queries": [
+        {
+          "custom_expression": "rate(node_network_transmit_carrier_total{instance=\"$instance\", job=\"$job\", orgid=\"$orgid\", anchorid=\"$anchorid\"}[30s])"
+        }
+      ]
+    },
+    {
+      "panel_id": "ARP entries",
+      "queries": [
+        {
+          "custom_expression": "node_arp_entries{instance=\"$instance\", job=\"$job\", orgid=\"$orgid\", anchorid=\"$anchorid\"}"
+        }
+      ]
+    },
+    {
+      "panel_id": "NF conntrack",
+      "queries": [
+        {
+          "custom_expression": "node_nf_conntrack_entries{instance=\"$instance\", job=\"$job\", orgid=\"$orgid\", anchorid=\"$anchorid\"}"
+        },
+        {
+          "custom_expression": "node_nf_conntrack_entries_limit{instance=\"$instance\", job=\"$job\", orgid=\"$orgid\", anchorid=\"$anchorid\"}"
+        }
+      ]
+    }
+  ]
+},
+  {
+  "group_name": "Network Sockstat",
+  "panels": [
+    {
+      "panel_id": "Sockstat TCP",
+      "queries": [
+        {
+          "custom_expression": "node_sockstat_TCP_alloc{instance=\"$instance\", job=\"$job\", orgid=\"$orgid\", anchorid=\"$anchorid\"}"
+        },
+        {
+          "custom_expression": "node_sockstat_TCP_inuse{instance=\"$instance\", job=\"$job\", orgid=\"$orgid\", anchorid=\"$anchorid\"}"
+        },
+        {
+          "custom_expression": "node_sockstat_TCP_orphan{instance=\"$instance\", job=\"$job\", orgid=\"$orgid\", anchorid=\"$anchorid\"}"
+        },
+        {
+          "custom_expression": "node_sockstat_TCP_tw{instance=\"$instance\", job=\"$job\", orgid=\"$orgid\", anchorid=\"$anchorid\"}"
+        }
+      ]
+    },
+    {
+      "panel_id": "Sockstat UDP",
+      "queries": [
+        {
+          "custom_expression": "node_sockstat_UDPLITE_inuse{instance=\"$instance\", job=\"$job\", orgid=\"$orgid\", anchorid=\"$anchorid\"}"
+        },
+        {
+          "custom_expression": "node_sockstat_UDP_inuse{instance=\"$instance\", job=\"$job\", orgid=\"$orgid\", anchorid=\"$anchorid\"}"
+        }
+      ]
+    },
+    {
+      "panel_id": "Sockstat Used",
+      "queries": [
+        {
+          "custom_expression": "node_sockstat_sockets_used{instance=\"$instance\", job=\"$job\", orgid=\"$orgid\", anchorid=\"$anchorid\"}"
+        }
+      ]
+    },
+    {
+      "panel_id": "Sockstat Frag / RAW",
+      "queries": [
+        {
+          "custom_expression": "node_sockstat_FRAG_inuse{instance=\"$instance\", job=\"$job\", orgid=\"$orgid\", anchorid=\"$anchorid\"}"
+        },
+        {
+          "custom_expression": "node_sockstat_RAW_inuse{instance=\"$instance\", job=\"$job\", orgid=\"$orgid\", anchorid=\"$anchorid\"}"
+        }
+      ]
+    },
+    {
+      "panel_id": "TCP / UDP Kernel Buffer Memory Pages",
+      "queries": [
+        {
+          "custom_expression": "node_sockstat_TCP_mem{instance=\"$instance\", job=\"$job\", orgid=\"$orgid\", anchorid=\"$anchorid\"}"
+        },
+        {
+          "custom_expression": "node_sockstat_UDP_mem{instance=\"$instance\", job=\"$job\", orgid=\"$orgid\", anchorid=\"$anchorid\"}"
+        }
+      ]
+    },
+    {
+      "panel_id": "Sockstat Memory Size",
+      "queries": [
+        {
+          "custom_expression": "node_sockstat_TCP_mem_bytes{instance=\"$instance\", job=\"$job\", orgid=\"$orgid\", anchorid=\"$anchorid\"}"
+        },
+        {
+          "custom_expression": "node_sockstat_UDP_mem_bytes{instance=\"$instance\", job=\"$job\", orgid=\"$orgid\", anchorid=\"$anchorid\"}"
+        },
+        {
+          "custom_expression": "node_sockstat_FRAG_memory{instance=\"$instance\", job=\"$job\", orgid=\"$orgid\", anchorid=\"$anchorid\"}"
+        }
+      ]
+    },
+    {
+      "panel_id": "Softnet Packets",
+      "queries": [
+        {
+          "custom_expression": "irate(node_softnet_processed_total{instance=\"$instance\", job=\"$job\", orgid=\"$orgid\", anchorid=\"$anchorid\"}[30s])"
+        },
+        {
+          "custom_expression": "irate(node_softnet_dropped_total{instance=\"$instance\", job=\"$job\", orgid=\"$orgid\", anchorid=\"$anchorid\"}[30s])"
+        }
+      ]
+    },
+    {
+      "panel_id": "Softnet Out Of Quota",
+      "queries": [
+        {
+          "custom_expression": "irate(node_softnet_times_squeezed_total{instance=\"$instance\", job=\"$job\", orgid=\"$orgid\", anchorid=\"$anchorid\"}[30s])"
+        }
+      ]
+    },
+    {
+      "panel_id": "Softnet RPS",
+      "queries": [
+        {
+          "custom_expression": "irate(node_softnet_received_rps_total{instance=\"$instance\", job=\"$job\", orgid=\"$orgid\", anchorid=\"$anchorid\"}[30s])"
+        },
+        {
+          "custom_expression": "irate(node_softnet_flow_limit_count_total{instance=\"$instance\", job=\"$job\", orgid=\"$orgid\", anchorid=\"$anchorid\"}[30s])"
+        }
+      ]
+    }
+  ]
+},
+{
+  "group_name": "Network Netstat",
+  "panels": [
+    {
+      "panel_id": "Netstat IP In / Out Octets",
+      "queries": [
+        {
+          "custom_expression": "irate(node_netstat_IpExt_InOctets{instance=\"$instance\", job=\"$job\", orgid=\"$orgid\", anchorid=\"$anchorid\"}[$__rate_interval])"
+        },
+        {
+          "custom_expression": "irate(node_netstat_IpExt_OutOctets{instance=\"$instance\", job=\"$job\", orgid=\"$orgid\", anchorid=\"$anchorid\"}[$__rate_interval])"
+        }
+      ]
+    },
+    {
+      "panel_id": "TCP In / Out",
+      "queries": [
+        {
+          "custom_expression": "irate(node_netstat_Tcp_InSegs{instance=\"$instance\", job=\"$job\", orgid=\"$orgid\", anchorid=\"$anchorid\"}[$__rate_interval])"
+        },
+        {
+          "custom_expression": "irate(node_netstat_Tcp_OutSegs{instance=\"$instance\", job=\"$job\", orgid=\"$orgid\", anchorid=\"$anchorid\"}[$__rate_interval])"
+        }
+      ]
+    },
+    {
+      "panel_id": "UDP In / Out",
+      "queries": [
+        {
+          "custom_expression": "irate(node_netstat_Udp_InDatagrams{instance=\"$instance\", job=\"$job\", orgid=\"$orgid\", anchorid=\"$anchorid\"}[$__rate_interval])"
+        },
+        {
+          "custom_expression": "irate(node_netstat_Udp_OutDatagrams{instance=\"$instance\", job=\"$job\", orgid=\"$orgid\", anchorid=\"$anchorid\"}[$__rate_interval])"
+        }
+      ]
+    },
+    {
+      "panel_id": "ICMP IN / OUT",
+      "queries": [
+        {
+          "custom_expression": "irate(node_netstat_Udp_OutDatagrams{instance=\"$instance\", job=\"$job\", orgid=\"$orgid\", anchorid=\"$anchorid\"}[$__rate_interval])"
+        },
+        {
+          "custom_expression": "irate(node_netstat_Icmp_OutMsgs{instance=\"$instance\", job=\"$job\", orgid=\"$orgid\", anchorid=\"$anchorid\"}[$__rate_interval])"
+        }
+      ]
+    },
+    {
+      "panel_id": "TCP Errors",
+      "queries": [
+        {
+          "custom_expression": "irate(node_netstat_TcpExt_ListenOverflows{instance=\"$instance\", job=\"$job\", orgid=\"$orgid\", anchorid=\"$anchorid\"}[$__rate_interval])"
+        },
+        {
+          "custom_expression": "irate(node_netstat_TcpExt_ListenDrops{instance=\"$instance\", job=\"$job\", orgid=\"$orgid\", anchorid=\"$anchorid\"}[$__rate_interval])"
+        },
+        {
+          "custom_expression": "irate(node_netstat_TcpExt_TCPSynRetrans{instance=\"$instance\", job=\"$job\", orgid=\"$orgid\", anchorid=\"$anchorid\"}[$__rate_interval])"
+        },
+        {
+          "custom_expression": "irate(node_netstat_Tcp_RetransSegs{instance=\"$instance\", job=\"$job\", orgid=\"$orgid\", anchorid=\"$anchorid\"}[$__rate_interval])"
+        },
+        {
+          "custom_expression": "irate(node_netstat_Tcp_InErrs{instance=\"$instance\", job=\"$job\", orgid=\"$orgid\", anchorid=\"$anchorid\"}[$__rate_interval])"
+        },
+        {
+          "custom_expression": "irate(node_netstat_Tcp_OutRsts{instance=\"$instance\", job=\"$job\", orgid=\"$orgid\", anchorid=\"$anchorid\"}[$__rate_interval])"
+        },
+        {
+          "custom_expression": "irate(node_netstat_TcpExt_TCPRcvQDrop{instance=\"$instance\", job=\"$job\", orgid=\"$orgid\", anchorid=\"$anchorid\"}[$__rate_interval])"
+        },
+        {
+          "custom_expression": "irate(node_netstat_TcpExt_TCPOFOQueue{instance=\"$instance\", job=\"$job\", orgid=\"$orgid\", anchorid=\"$anchorid\"}[$__rate_interval])"
+        },
+        {
+          "custom_expression": "irate(node_netstat_TcpExt_TCPTimeouts{instance=\"$instance\", job=\"$job\", orgid=\"$orgid\", anchorid=\"$anchorid\"}[$__rate_interval])"
+        }
+      ]
+    },
+    {
+      "panel_id": "TCP SynCookie",
+      "queries": [
+        {
+          "custom_expression": "irate(node_netstat_TcpExt_SyncookiesFailed{instance=\"$instance\", job=\"$job\", orgid=\"$orgid\", anchorid=\"$anchorid\"}[$__rate_interval])"
+        },
+        {
+          "custom_expression": "irate(node_netstat_TcpExt_SyncookiesRecv{instance=\"$instance\", job=\"$job\", orgid=\"$orgid\", anchorid=\"$anchorid\"}[$__rate_interval])"
+        },
+        {
+          "custom_expression": "irate(node_netstat_TcpExt_SyncookiesSent{instance=\"$instance\", job=\"$job\", orgid=\"$orgid\", anchorid=\"$anchorid\"}[$__rate_interval])"
+        }
+      ]
+    },
+    {
+      "panel_id": "TCP Connections",
+      "queries": [
+        {
+          "custom_expression": "node_netstat_Tcp_CurrEstab{instance=\"$instance\", job=\"$job\", orgid=\"$orgid\", anchorid=\"$anchorid\"}"
+        }
+      ]
+    },
+    {
+      "panel_id": "UDP Queue",
+      "queries": [
+        {
+          "custom_expression": "node_udp_queues{instance=\"$instance\", job=\"$job\", orgid=\"$orgid\", anchorid=\"$anchorid\", ip=\"v4\", queue=\"rx\"}"
+        },
+        {
+          "custom_expression": "node_udp_queues{instance=\"$instance\", job=\"$job\", orgid=\"$orgid\", anchorid=\"$anchorid\", ip=\"v4\", queue=\"tx\"}"
+        }
+      ]
+    },
+    {
+      "panel_id": "TCP Direct Transition",
+      "queries": [
+        {
+          "custom_expression": "irate(node_netstat_Tcp_ActiveOpens{instance=\"$instance\", job=\"$job\", orgid=\"$orgid\", anchorid=\"$anchorid\"}[$__rate_interval])"
+        },
+        {
+          "custom_expression": "irate(node_netstat_Tcp_PassiveOpens{instance=\"$instance\", job=\"$job\", orgid=\"$orgid\", anchorid=\"$anchorid\"}[$__rate_interval])"
+        }
+      ]
+    }
   ]
 }
+  ]
+}
+
 
 
 
