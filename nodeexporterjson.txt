@@ -240,3 +240,20 @@
 
   ]
 }
+
+
+
+
+--------------------------------
+
+{
+  "type": "update_filters",
+  "filters": {
+    "org": "org-a",
+    "region": "us-west",
+    "job": "cadvisor",
+    "instance": "10.0.2.126:8080",
+    "env": "prod",
+    "name_regex": "nginx|redis"
+  }
+}
