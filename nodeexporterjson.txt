@@ -525,7 +525,7 @@
       "panel_id": "ICMP IN / OUT",
       "queries": [
         {
-          "custom_expression": "irate(node_netstat_Udp_OutDatagrams{instance=\"$instance\", job=\"$job\", orgid=\"$orgid\", anchorid=\"$anchorid\"}[$__rate_interval])"
+          "custom_expression": "irate(node_netstat_Icmp_InMsgs{instance=\"$instance\", job=\"$job\", orgid=\"$orgid\", anchorid=\"$anchorid\"}[$__rate_interval])"
         },
         {
           "custom_expression": "irate(node_netstat_Icmp_OutMsgs{instance=\"$instance\", job=\"$job\", orgid=\"$orgid\", anchorid=\"$anchorid\"}[$__rate_interval])"
@@ -612,8 +612,6 @@
 }
   ]
 }
-
-
 
 
 
