@@ -5,7 +5,7 @@
   "filters": {
     "orgid": "Surya",
     "anchorid": "anchor-125",
-    "instance": "10.0.2.126:9100",
+    "instance": "10.0.2.113:9100",
     "job": "node_exporters"
   },
   "groups": [
@@ -266,10 +266,10 @@
       "panel_id": "Network Traffic by Packets",
       "queries": [
         {
-          "custom_expression": "rate(node_network_receive_packets_total{instance=\"$instance\", job=\"$job\", orgid=\"$orgid\", anchorid=\"$anchorid\"}[30s])"
+          "custom_expression": "rate(node_network_receive_packets_total{instance=\"$instance\", job=\"$job\", orgid=\"$orgid\", anchorid=\"$anchorid\"}[1m])"
         },
         {
-          "custom_expression": "rate(node_network_transmit_packets_total{instance=\"$instance\", job=\"$job\", orgid=\"$orgid\", anchorid=\"$anchorid\"}[30s])"
+          "custom_expression": "rate(node_network_transmit_packets_total{instance=\"$instance\", job=\"$job\", orgid=\"$orgid\", anchorid=\"$anchorid\"}[1m])"
         }
       ]
     },
@@ -288,10 +288,10 @@
       "panel_id": "Network Traffic Drop",
       "queries": [
         {
-          "custom_expression": "rate(node_network_receive_drop_total{instance=\"$instance\", job=\"$job\", orgid=\"$orgid\", anchorid=\"$anchorid\"}[30s])"
+          "custom_expression": "rate(node_network_receive_drop_total{instance=\"$instance\", job=\"$job\", orgid=\"$orgid\", anchorid=\"$anchorid\"}[1m])"
         },
         {
-          "custom_expression": "rate(node_network_transmit_drop_total{instance=\"$instance\", job=\"$job\", orgid=\"$orgid\", anchorid=\"$anchorid\"}[30s])"
+          "custom_expression": "rate(node_network_transmit_drop_total{instance=\"$instance\", job=\"$job\", orgid=\"$orgid\", anchorid=\"$anchorid\"}[1m])"
         }
       ]
     },
@@ -299,10 +299,10 @@
       "panel_id": "Network Traffic Compressed",
       "queries": [
         {
-          "custom_expression": "rate(node_network_receive_compressed_total{instance=\"$instance\", job=\"$job\", orgid=\"$orgid\", anchorid=\"$anchorid\"}[30s])"
+          "custom_expression": "rate(node_network_receive_compressed_total{instance=\"$instance\", job=\"$job\", orgid=\"$orgid\", anchorid=\"$anchorid\"}[1m])"
         },
         {
-          "custom_expression": "rate(node_network_transmit_compressed_total{instance=\"$instance\", job=\"$job\", orgid=\"$orgid\", anchorid=\"$anchorid\"}[30s])"
+          "custom_expression": "rate(node_network_transmit_compressed_total{instance=\"$instance\", job=\"$job\", orgid=\"$orgid\", anchorid=\"$anchorid\"}[1m])"
         }
       ]
     },
@@ -310,7 +310,7 @@
       "panel_id": "Network Traffic Multicast",
       "queries": [
         {
-          "custom_expression": "rate(node_network_receive_multicast_total{instance=\"$instance\", job=\"$job\", orgid=\"$orgid\", anchorid=\"$anchorid\"}[30s])"
+          "custom_expression": "rate(node_network_receive_multicast_total{instance=\"$instance\", job=\"$job\", orgid=\"$orgid\", anchorid=\"$anchorid\"}[1m])"
         }
       ]
     },
@@ -318,7 +318,7 @@
       "panel_id": "Network Traffic NoHandler",
       "queries": [
         {
-          "custom_expression": "rate(node_network_receive_nohandler_total{instance=\"$instance\", job=\"$job\", orgid=\"$orgid\", anchorid=\"$anchorid\"}[30s])"
+          "custom_expression": "rate(node_network_receive_nohandler_total{instance=\"$instance\", job=\"$job\", orgid=\"$orgid\", anchorid=\"$anchorid\"}[1m])"
         }
       ]
     },
@@ -326,7 +326,7 @@
       "panel_id": "Network Traffic Frame",
       "queries": [
         {
-          "custom_expression": "rate(node_network_receive_frame_total{instance=\"$instance\", job=\"$job\", orgid=\"$orgid\", anchorid=\"$anchorid\"}[30s])"
+          "custom_expression": "rate(node_network_receive_frame_total{instance=\"$instance\", job=\"$job\", orgid=\"$orgid\", anchorid=\"$anchorid\"}[1m])"
         }
       ]
     },
@@ -334,10 +334,10 @@
       "panel_id": "Network Traffic Fifo",
       "queries": [
         {
-          "custom_expression": "rate(node_network_receive_fifo_total{instance=\"$instance\", job=\"$job\", orgid=\"$orgid\", anchorid=\"$anchorid\"}[30s])"
+          "custom_expression": "rate(node_network_receive_fifo_total{instance=\"$instance\", job=\"$job\", orgid=\"$orgid\", anchorid=\"$anchorid\"}[1m])"
         },
         {
-          "custom_expression": "rate(node_network_transmit_fifo_total{instance=\"$instance\", job=\"$job\", orgid=\"$orgid\", anchorid=\"$anchorid\"}[30s])"
+          "custom_expression": "rate(node_network_transmit_fifo_total{instance=\"$instance\", job=\"$job\", orgid=\"$orgid\", anchorid=\"$anchorid\"}[1m])"
         }
       ]
     },
@@ -345,7 +345,7 @@
       "panel_id": "Network Traffic Collision",
       "queries": [
         {
-          "custom_expression": "rate(node_network_transmit_colls_total{instance=\"$instance\", job=\"$job\", orgid=\"$orgid\", anchorid=\"$anchorid\"}[30s])"
+          "custom_expression": "rate(node_network_transmit_colls_total{instance=\"$instance\", job=\"$job\", orgid=\"$orgid\", anchorid=\"$anchorid\"}[1m])"
         }
       ]
     },
@@ -353,7 +353,7 @@
       "panel_id": "Network Traffic Carrier errors",
       "queries": [
         {
-          "custom_expression": "rate(node_network_transmit_carrier_total{instance=\"$instance\", job=\"$job\", orgid=\"$orgid\", anchorid=\"$anchorid\"}[30s])"
+          "custom_expression": "rate(node_network_transmit_carrier_total{instance=\"$instance\", job=\"$job\", orgid=\"$orgid\", anchorid=\"$anchorid\"}[1m])"
         }
       ]
     },
@@ -612,7 +612,6 @@
 }
   ]
 }
-
 
 
 
