@@ -8,11 +8,30 @@ from pydantic import BaseModel
 from typing import List, Optional
 import time
 import datetime
+from fastapi.middleware.cors import CORSMiddleware
+import orjson
 
 app = FastAPI()
 
 # Base VictoriaMetrics URL
 VICTORIA_BASE_URL = "http://34.131.24.129:8428"
+
+
+# ✅ CORS settings
+origins = [
+    "http://localhost:3000",  # Local frontend
+    "https://your-frontend-domain.com",  # Replace with your actual frontend domain
+    "*"  # ❗ Use "*" only in development; avoid in production for security
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,            # Allow listed origins
+    allow_credentials=True,
+    allow_methods=["*"],              # Allow all HTTP methods
+    allow_headers=["*"],              # Allow all headers
+)
+
 
 def match_operator(value: str) -> str:
     return "=~" if ".*" in value else "="
@@ -394,11 +413,14 @@ async def websocket_dashboard(websocket: WebSocket):
     config = {"dashboard_id": None, "interval": 10, "filters": {}, "groups": []}
     last_up_time = {}
 
+    allowed_filter_keys = {"orgid", "anchorid", "instance", "job", "name_regex"}
+
     try:
         while True:
             try:
                 message = await asyncio.wait_for(websocket.receive_json(), timeout=0.1)
                 msg_type = message.get("type")
+
                 if msg_type == "init":
                     config.update({
                         "dashboard_id": message.get("dashboard_id"),
@@ -406,11 +428,16 @@ async def websocket_dashboard(websocket: WebSocket):
                         "filters": message.get("filters", {}),
                         "groups": message.get("groups", [])
                     })
+
                 elif msg_type == "update_filters":
-                    if "filters" in message:
-                        config["filters"].update(message["filters"])
+                    # Only update allowed filter keys
+                    new_filters = message.get("filters", {})
+                    for key in allowed_filter_keys:
+                        if key in new_filters:
+                            config["filters"][key] = new_filters[key]
                     if "interval" in message:
                         config["interval"] = message["interval"]
+
             except asyncio.TimeoutError:
                 pass  # no message, continue
 
@@ -487,7 +514,7 @@ async def websocket_dashboard(websocket: WebSocket):
                     group_result["panels"].append(panel_result)
                 full_response["results"].append(group_result)
 
-            await websocket.send_text(json.dumps(full_response))
+            await websocket.send_text(orjson.dumps(full_response).decode("utf-8"))
 
             elapsed = time.time() - start_time
             delay = max(0, config["interval"] - elapsed)
@@ -496,7 +523,7 @@ async def websocket_dashboard(websocket: WebSocket):
     except WebSocketDisconnect:
         print(f"Dashboard disconnected: {config['dashboard_id']}")
     except Exception as e:
-        await websocket.send_text(json.dumps({
+        await websocket.send_text(orjson.dumps({
             "type": "error",
             "message": str(e)
-        }))
+        }).decode("utf-8"))

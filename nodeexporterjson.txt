@@ -3,9 +3,9 @@
   "dashboard_id": "systemmetrics",
   "interval": 2,
   "filters": {
-    "orgid": "1",
-    "anchorid": "1",
-    "instance": "10.0.2.126:9100",
+    "orgid": "Surya",
+    "anchorid": "anchor-125",
+    "instance": "10.0.2.113:9100",
     "job": "node_exporters"
   },
   "groups": [
@@ -215,8 +215,8 @@
     {
       "panel_id": "Disk IOPS",
       "queries": [
-        { "custom_expression": "irate(node_disk_reads_completed_total{instance=\"$instance\",job=\"$job\",orgid=\"$orgid\",anchorid=\"$anchorid\",device=~\"[a-z]+|nvme[0-9]+n[0-9]+|mmcblk[0-9]+\"}[30s])" },
-        { "custom_expression": "irate(node_disk_writes_completed_total{instance=\"$instance\",job=\"$job\",orgid=\"$orgid\",anchorid=\"$anchorid\",device=~\"[a-z]+|nvme[0-9]+n[0-9]+|mmcblk[0-9]+\"}[30s])" }
+        { "custom_expression": "irate(node_disk_reads_completed_total{instance=\"$instance\",job=\"$job\",orgid=\"$orgid\",anchorid=\"$anchorid\",device!~\"rootfs\"}[$__rate_interval])" },
+        { "custom_expression": "irate(node_disk_reads_completed_total{instance=\"$instance\",job=\"$job\",orgid=\"$orgid\",anchorid=\"$anchorid\",device!~\"rootfs\"}[$__rate_interval])" }
       ]
     },
     {
@@ -595,16 +595,15 @@
 
 
 
+
 --------------------------------
 
 {
   "type": "update_filters",
   "filters": {
-    "org": "org-a",
-    "region": "us-west",
-    "job": "cadvisor",
-    "instance": "10.0.2.126:8080",
-    "env": "prod",
-    "name_regex": "nginx|redis"
+    "orgid": "Surya",
+    "anchorid": "2",
+    "instance": "*",
+    "job": "node_exporters"
   }
 }
