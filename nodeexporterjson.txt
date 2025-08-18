@@ -105,22 +105,22 @@
       "panel_id": "CPU Basic",
       "queries": [
         {
-          "custom_expression": "sum(irate(node_cpu_seconds_total{instance=\"$instance\",job=\"$job\",mode=\"system\",orgid=\"$orgid\",anchorid=\"$anchorid\"}[30s])) / scalar(count(count(node_cpu_seconds_total{instance=\"$instance\",job=\"$job\",orgid=\"$orgid\",anchorid=\"$anchorid\"}) by (cpu)))"
+          "custom_expression": "sum(rate(node_cpu_seconds_total{instance=\"$instance\",job=\"$job\",mode=\"system\",orgid=\"$orgid\",anchorid=\"$anchorid\"}[2m])) / scalar(count(count(node_cpu_seconds_total{instance=\"$instance\",job=\"$job\",orgid=\"$orgid\",anchorid=\"$anchorid\"}) by (cpu)))"
         },
         {
-          "custom_expression": "sum(irate(node_cpu_seconds_total{instance=\"$instance\",job=\"$job\",mode=\"user\",orgid=\"$orgid\",anchorid=\"$anchorid\"}[30s])) / scalar(count(count(node_cpu_seconds_total{instance=\"$instance\",job=\"$job\",orgid=\"$orgid\",anchorid=\"$anchorid\"}) by (cpu)))"
+          "custom_expression": "sum(rate(node_cpu_seconds_total{instance=\"$instance\",job=\"$job\",mode=\"user\",orgid=\"$orgid\",anchorid=\"$anchorid\"}[2m])) / scalar(count(count(node_cpu_seconds_total{instance=\"$instance\",job=\"$job\",orgid=\"$orgid\",anchorid=\"$anchorid\"}) by (cpu)))"
         },
         {
-          "custom_expression": "sum(irate(node_cpu_seconds_total{instance=\"$instance\",job=\"$job\",mode=\"iowait\",orgid=\"$orgid\",anchorid=\"$anchorid\"}[30s])) / scalar(count(count(node_cpu_seconds_total{instance=\"$instance\",job=\"$job\",orgid=\"$orgid\",anchorid=\"$anchorid\"}) by (cpu)))"
+          "custom_expression": "sum(rate(node_cpu_seconds_total{instance=\"$instance\",job=\"$job\",mode=\"iowait\",orgid=\"$orgid\",anchorid=\"$anchorid\"}[2m])) / scalar(count(count(node_cpu_seconds_total{instance=\"$instance\",job=\"$job\",orgid=\"$orgid\",anchorid=\"$anchorid\"}) by (cpu)))"
         },
         {
-          "custom_expression": "sum(irate(node_cpu_seconds_total{instance=\"$instance\",job=\"$job\",mode=~\".*irq\",orgid=\"$orgid\",anchorid=\"$anchorid\"}[30s])) / scalar(count(count(node_cpu_seconds_total{instance=\"$instance\",job=\"$job\",orgid=\"$orgid\",anchorid=\"$anchorid\"}) by (cpu)))"
+          "custom_expression": "sum(rate(node_cpu_seconds_total{instance=\"$instance\",job=\"$job\",mode=~\".*irq\",orgid=\"$orgid\",anchorid=\"$anchorid\"}[2m])) / scalar(count(count(node_cpu_seconds_total{instance=\"$instance\",job=\"$job\",orgid=\"$orgid\",anchorid=\"$anchorid\"}) by (cpu)))"
         },
         {
-          "custom_expression": "sum(irate(node_cpu_seconds_total{instance=\"$instance\",job=\"$job\",mode!=\"idle\",mode!=\"user\",mode!=\"system\",mode!=\"iowait\",mode!=\"irq\",mode!=\"softirq\",orgid=\"$orgid\",anchorid=\"$anchorid\"}[30s])) / scalar(count(count(node_cpu_seconds_total{instance=\"$instance\",job=\"$job\",orgid=\"$orgid\",anchorid=\"$anchorid\"}) by (cpu)))"
+          "custom_expression": "sum(rate(node_cpu_seconds_total{instance=\"$instance\",job=\"$job\",mode!=\"idle\",mode!=\"user\",mode!=\"system\",mode!=\"iowait\",mode!=\"irq\",mode!=\"softirq\",orgid=\"$orgid\",anchorid=\"$anchorid\"}[2m])) / scalar(count(count(node_cpu_seconds_total{instance=\"$instance\",job=\"$job\",orgid=\"$orgid\",anchorid=\"$anchorid\"}) by (cpu)))"
         },
         {
-          "custom_expression": "sum(irate(node_cpu_seconds_total{instance=\"$instance\",job=\"$job\",mode=\"idle\",orgid=\"$orgid\",anchorid=\"$anchorid\"}[30s])) / scalar(count(count(node_cpu_seconds_total{instance=\"$instance\",job=\"$job\",orgid=\"$orgid\",anchorid=\"$anchorid\"}) by (cpu)))"
+          "custom_expression": "sum(rate(node_cpu_seconds_total{instance=\"$instance\",job=\"$job\",mode=\"idle\",orgid=\"$orgid\",anchorid=\"$anchorid\"}[2m])) / scalar(count(count(node_cpu_seconds_total{instance=\"$instance\",job=\"$job\",orgid=\"$orgid\",anchorid=\"$anchorid\"}) by (cpu)))"
         }
       ]
     },
@@ -148,10 +148,10 @@
       "panel_id": "Network Traffic Basic",
       "queries": [
         {
-          "custom_expression": "rate(node_network_receive_bytes_total{instance=\"$instance\",job=\"$job\",orgid=\"$orgid\",anchorid=\"$anchorid\"}[30s]) * 8"
+          "custom_expression": "rate(node_network_receive_bytes_total{instance=\"$instance\",job=\"$job\",orgid=\"$orgid\",anchorid=\"$anchorid\"}[1m]) * 8"
         },
         {
-          "custom_expression": "rate(node_network_transmit_bytes_total{instance=\"$instance\",job=\"$job\",orgid=\"$orgid\",anchorid=\"$anchorid\"}[30s]) * 8"
+          "custom_expression": "rate(node_network_transmit_bytes_total{instance=\"$instance\",job=\"$job\",orgid=\"$orgid\",anchorid=\"$anchorid\"}[1m]) * 8"
         }
       ]
     },

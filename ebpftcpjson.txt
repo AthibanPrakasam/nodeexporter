@@ -1,0 +1,143 @@
+{
+  "type": "update_filters",
+  "filters": {
+    "orgid": "Surya",
+    "anchorid": "anchor-125",
+    "instance": "34.131.24.129:9091",
+    "job": "ebpf_tcp",
+    "saddr": ["192.168.1.10", "192.168.1.20", "172.17.0.3"],
+    "sport": ["80", "443"],
+    "daddr": ["10.0.0.5", "10.0.0.6"],
+    "dport": ["5000", "9090"]
+  },
+  "interval": 5
+}
+
+
+{
+  "type": "init",
+  "dashboard_id": "ebpf_dashboard",
+  "interval": 5,
+  "filters": {
+    "orgid": "Surya",
+    "anchorid": "anchor-125",
+    "instance": "34.131.24.129:9091",
+    "job": "ebpf_tcp",
+    "saddr": [".*"],
+    "sport": [".*"],
+    "daddr": [".*"],
+    "dport": [".*"]
+  },
+  "groups": [
+    {
+      "group_name": "Exporter Health",
+      "panels": [
+        {
+          "panel_id": "Exporter Up",
+          "queries": [
+            {
+              "custom_expression": "up{instance=\"$instance\",job=\"$job\",orgid=\"$orgid\",anchorid=\"$anchorid\"}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "group_name": "TCP Sessions",
+      "panels": [
+        {
+          "panel_id": "Active TCP Sessions",
+          "queries": [
+            {
+              "custom_expression": "count(tcp_session_last_seen_seconds{orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",saddr=~\"$saddr\",sport=~\"$sport\",daddr=~\"$daddr\",dport=~\"$dport\",job=\"$job\"}) by (saddr,daddr,sport,dport)"
+            }
+          ]
+        },
+        {
+          "panel_id": "Current Packets in Flight 🚀",
+          "queries": [
+            {
+              "custom_expression": "avg(tcp_packets_out{saddr=~\"$saddr\", sport=~\"$sport\", daddr=~\"$daddr\", dport=~\"$dport\"})"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "group_name": "TCP_Window Management",
+      "panels": [
+        {
+          "panel_id": "Current Receive Window (Bytes)",
+          "queries": [
+            {
+              "custom_expression": "tcp_receive_window_bytes{saddr=~\"$saddr\", sport=~\"$sport\", daddr=~\"$daddr\", dport=~\"$dport\"}"
+            }
+          ]
+        },
+        {
+          "panel_id": "Current Send Window (Bytes) 📊",
+          "queries": [
+            {
+              "custom_expression": "tcp_send_window_bytes{saddr=~\"$saddr\", sport=~\"$sport\", daddr=~\"$daddr\", dport=~\"$dport\"}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "group_name": "TCP_Retransmissions & Packet Loss",
+      "panels": [
+        {
+          "panel_id": "Packet Reordering (Rate) 🧩",
+          "queries": [
+            {
+              "custom_expression": "rate(tcp_reordering{saddr=~\"$saddr\", sport=~\"$sport\", daddr=~\"$daddr\", dport=~\"$dport\"}[5m])"
+            }
+          ]
+        },
+        {
+          "panel_id": "Lost Packets (Rate) 📉",
+          "queries": [
+            {
+              "custom_expression": "rate(tcp_lost_out{saddr=~\"$saddr\", sport=~\"$sport\", daddr=~\"$daddr\", dport=~\"$dport\"}[5m])"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "group_name": "TCP_Round Trip Time (RTT) & Latency",
+      "panels": [
+        {
+          "panel_id": "Smoothed Round Trip Time (SRTT) (Microseconds) ⏱️",
+          "queries": [
+            {
+              "custom_expression": "avg(tcp_srtt_microseconds{saddr=~\"$saddr\", sport=~\"$sport\", daddr=~\"$daddr\", dport=~\"$dport\"}) by (saddr, daddr, sport, dport)"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "group_name": "TCP_Session Overview",
+      "panels": [
+        {
+          "panel_id": "Last Seen Session Timestamp (Seconds) 🕰️",
+          "queries": [
+            {
+              "custom_expression": "tcp_session_last_seen_seconds{saddr=~\"$saddr\", sport=~\"$sport\", daddr=~\"$daddr\", dport=~\"$dport\"}"
+            }
+          ]
+        },
+        {
+          "panel_id": "Session Events (Rate) 🔔",
+          "queries": [
+            {
+              "custom_expression": "rate(tcp_session_events_total{saddr=~\"$saddr\", sport=~\"$sport\", daddr=~\"$daddr\", dport=~\"$dport\"}[5m])"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
