@@ -1,0 +1,1296 @@
+{
+    "timestamp": 1755628406,
+    "timestamp_iso": "2025-08-19T18:33:26Z",
+    "dashboard_id": "ebpf_dashboard",
+    "results": [
+        {
+            "group_name": "UDP_Error/Drops Insight",
+            "panels": [
+                {
+                    "panel_id": "Total UDP Drops",
+                    "queries": [
+                        {
+                            "promql": "sum(udp_drops_total{saddr=~\".*\",sport=~\".*\",daddr=~\".*\",dport=~\".*\",orgid=\"Surya\",anchorid=\"anchor-125\",instance=\"34.131.24.129:9091\",job=\"ebpf_udp\"})",
+                            "data": {
+                                "resultType": "vector",
+                                "result": [
+                                    {
+                                        "metric": {},
+                                        "value": [
+                                            1755628406,
+                                            "15"
+                                        ]
+                                    }
+                                ]
+                            },
+                            "status": "up",
+                            "last_seen_up": "2025-08-19T18:33:26Z"
+                        }
+                    ]
+                },
+                {
+                    "panel_id": "UDP Session Drops per Destination",
+                    "queries": [
+                        {
+                            "promql": "sum(rate(udp_session_drops_total{saddr=~\".*\",sport=~\".*\",daddr=~\".*\",dport=~\".*\",orgid=\"Surya\",anchorid=\"anchor-125\",instance=\"34.131.24.129:9091\",job=\"ebpf_udp\"}[5m])) by (daddr, dport)",
+                            "data": {
+                                "resultType": "vector",
+                                "result": [
+                                    {
+                                        "metric": {
+                                            "daddr": "0.0.0.0",
+                                            "dport": "0"
+                                        },
+                                        "value": [
+                                            1755628406,
+                                            "0.013333333333333334"
+                                        ]
+                                    },
+                                    {
+                                        "metric": {
+                                            "daddr": "11.0.0.127",
+                                            "dport": "13568"
+                                        },
+                                        "value": [
+                                            1755628406,
+                                            "0"
+                                        ]
+                                    },
+                                    {
+                                        "metric": {
+                                            "daddr": "254.169.254.169",
+                                            "dport": "13568"
+                                        },
+                                        "value": [
+                                            1755628406,
+                                            "0"
+                                        ]
+                                    },
+                                    {
+                                        "metric": {
+                                            "daddr": "53.0.0.127",
+                                            "dport": "13568"
+                                        },
+                                        "value": [
+                                            1755628406,
+                                            "0"
+                                        ]
+                                    }
+                                ]
+                            },
+                            "status": "up",
+                            "last_seen_up": "2025-08-19T18:33:26Z"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "group_name": "UDP_Top N Views",
+            "panels": [
+                {
+                    "panel_id": "Top 10 Destination Ports by Bytes",
+                    "queries": [
+                        {
+                            "promql": "topk(10, sum(rate(udp_rx_bytes_total{saddr=~\".*\",sport=~\".*\",daddr=~\".*\",dport=~\".*\",orgid=\"Surya\",anchorid=\"anchor-125\",instance=\"34.131.24.129:9091\",job=\"ebpf_udp\"}[5m])) by (dport))",
+                            "data": {
+                                "resultType": "vector",
+                                "result": [
+                                    {
+                                        "metric": {
+                                            "dport": "0"
+                                        },
+                                        "value": [
+                                            1755628406,
+                                            "1712.32"
+                                        ]
+                                    },
+                                    {
+                                        "metric": {
+                                            "dport": "13568"
+                                        },
+                                        "value": [
+                                            1755628406,
+                                            "0"
+                                        ]
+                                    }
+                                ]
+                            },
+                            "status": "up",
+                            "last_seen_up": "2025-08-19T18:33:26Z"
+                        }
+                    ]
+                },
+                {
+                    "panel_id": "Top 10 Source IPs by Packets",
+                    "queries": [
+                        {
+                            "promql": "topk(10, sum(rate(udp_tx_packets_total{saddr=~\".*\",sport=~\".*\",daddr=~\".*\",dport=~\".*\",orgid=\"Surya\",anchorid=\"anchor-125\",instance=\"34.131.24.129:9091\",job=\"ebpf_udp\"}[5m])) by (saddr))",
+                            "data": {
+                                "resultType": "vector",
+                                "result": [
+                                    {
+                                        "metric": {
+                                            "saddr": "11.0.0.127"
+                                        },
+                                        "value": [
+                                            1755628406,
+                                            "0.013333333333333334"
+                                        ]
+                                    },
+                                    {
+                                        "metric": {
+                                            "saddr": "53.0.0.127"
+                                        },
+                                        "value": [
+                                            1755628406,
+                                            "0.006666666666666667"
+                                        ]
+                                    },
+                                    {
+                                        "metric": {
+                                            "saddr": "1.0.0.127"
+                                        },
+                                        "value": [
+                                            1755628406,
+                                            "0"
+                                        ]
+                                    },
+                                    {
+                                        "metric": {
+                                            "saddr": "2.0.190.10"
+                                        },
+                                        "value": [
+                                            1755628406,
+                                            "0"
+                                        ]
+                                    }
+                                ]
+                            },
+                            "status": "up",
+                            "last_seen_up": "2025-08-19T18:33:26Z"
+                        }
+                    ]
+                },
+                {
+                    "panel_id": "Top Processes by Traffic (PID Breakdown)",
+                    "queries": [
+                        {
+                            "promql": "topk(10, sum(rate(udp_rx_bytes_total{saddr=~\".*\",sport=~\".*\",daddr=~\".*\",dport=~\".*\",orgid=\"Surya\",anchorid=\"anchor-125\",instance=\"34.131.24.129:9091\",job=\"ebpf_udp\"}[5m])) by (pid)) or topk(10, sum(rate(udp_tx_bytes_total{saddr=~\".*\",sport=~\".*\",daddr=~\".*\",dport=~\".*\",orgid=\"Surya\",anchorid=\"anchor-125\",instance=\"34.131.24.129:9091\",job=\"ebpf_udp\"}[5m])) by (pid))",
+                            "data": {
+                                "resultType": "vector",
+                                "result": [
+                                    {
+                                        "metric": {
+                                            "pid": "210"
+                                        },
+                                        "value": [
+                                            1755628406,
+                                            "26.133333333333333"
+                                        ]
+                                    },
+                                    {
+                                        "metric": {
+                                            "pid": "2715"
+                                        },
+                                        "value": [
+                                            1755628406,
+                                            "0"
+                                        ]
+                                    },
+                                    {
+                                        "metric": {
+                                            "pid": "631"
+                                        },
+                                        "value": [
+                                            1755628406,
+                                            "0"
+                                        ]
+                                    },
+                                    {
+                                        "metric": {
+                                            "pid": "814"
+                                        },
+                                        "value": [
+                                            1755628406,
+                                            "1686.1866666666665"
+                                        ]
+                                    }
+                                ]
+                            },
+                            "status": "up",
+                            "last_seen_up": "2025-08-19T18:33:26Z"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "group_name": "UDP Traffic Overview",
+            "panels": [
+                {
+                    "panel_id": "UDP Session Duration Sec",
+                    "queries": [
+                        {
+                            "promql": "max(udp_session_duration_seconds{saddr=~\".*\",sport=~\".*\",daddr=~\".*\",dport=~\".*\",orgid=\"Surya\",anchorid=\"anchor-125\",instance=\"34.131.24.129:9091\",job=\"ebpf_udp\"})",
+                            "data": {
+                                "resultType": "vector",
+                                "result": [
+                                    {
+                                        "metric": {},
+                                        "value": [
+                                            1755628406,
+                                            "244.087242558"
+                                        ]
+                                    }
+                                ]
+                            },
+                            "status": "up",
+                            "last_seen_up": "2025-08-19T18:33:26Z"
+                        }
+                    ]
+                },
+                {
+                    "panel_id": "UDP Active Sessions",
+                    "queries": [
+                        {
+                            "promql": "sum(udp_active_sessions{saddr=~\".*\",sport=~\".*\",daddr=~\".*\",dport=~\".*\",orgid=\"Surya\",anchorid=\"anchor-125\",instance=\"34.131.24.129:9091\",job=\"ebpf_udp\"})",
+                            "data": {
+                                "resultType": "vector",
+                                "result": [
+                                    {
+                                        "metric": {},
+                                        "value": [
+                                            1755628406,
+                                            "19"
+                                        ]
+                                    }
+                                ]
+                            },
+                            "status": "up",
+                            "last_seen_up": "2025-08-19T18:33:26Z"
+                        }
+                    ]
+                },
+                {
+                    "panel_id": "UDP Session Last Seen (seconds ago)",
+                    "queries": [
+                        {
+                            "promql": "time() - udp_session_last_seen_seconds{saddr=~\".*\",sport=~\".*\",daddr=~\".*\",dport=~\".*\",orgid=\"Surya\",anchorid=\"anchor-125\",instance=\"34.131.24.129:9091\",job=\"ebpf_udp\"}",
+                            "data": {
+                                "resultType": "vector",
+                                "result": [
+                                    {
+                                        "metric": {
+                                            "anchorid": "anchor-125",
+                                            "daddr": "0.0.0.0",
+                                            "dport": "0",
+                                            "instance": "34.131.24.129:9091",
+                                            "job": "ebpf_udp",
+                                            "orgid": "Surya",
+                                            "pid": "210",
+                                            "saddr": "53.0.0.127",
+                                            "sport": "53"
+                                        },
+                                        "value": [
+                                            1755628406,
+                                            "1755578257.994832"
+                                        ]
+                                    },
+                                    {
+                                        "metric": {
+                                            "anchorid": "anchor-125",
+                                            "daddr": "0.0.0.0",
+                                            "dport": "0",
+                                            "instance": "34.131.24.129:9091",
+                                            "job": "ebpf_udp",
+                                            "orgid": "Surya",
+                                            "pid": "814",
+                                            "saddr": "11.0.0.127",
+                                            "sport": "39421"
+                                        },
+                                        "value": [
+                                            1755628406,
+                                            "1755578062.4697075"
+                                        ]
+                                    },
+                                    {
+                                        "metric": {
+                                            "anchorid": "anchor-125",
+                                            "daddr": "0.0.0.0",
+                                            "dport": "0",
+                                            "instance": "34.131.24.129:9091",
+                                            "job": "ebpf_udp",
+                                            "orgid": "Surya",
+                                            "pid": "814",
+                                            "saddr": "11.0.0.127",
+                                            "sport": "39772"
+                                        },
+                                        "value": [
+                                            1755628406,
+                                            "1755578061.74204"
+                                        ]
+                                    },
+                                    {
+                                        "metric": {
+                                            "anchorid": "anchor-125",
+                                            "daddr": "0.0.0.0",
+                                            "dport": "0",
+                                            "instance": "34.131.24.129:9091",
+                                            "job": "ebpf_udp",
+                                            "orgid": "Surya",
+                                            "pid": "814",
+                                            "saddr": "11.0.0.127",
+                                            "sport": "41184"
+                                        },
+                                        "value": [
+                                            1755628406,
+                                            "1755578060.9663763"
+                                        ]
+                                    },
+                                    {
+                                        "metric": {
+                                            "anchorid": "anchor-125",
+                                            "daddr": "0.0.0.0",
+                                            "dport": "0",
+                                            "instance": "34.131.24.129:9091",
+                                            "job": "ebpf_udp",
+                                            "orgid": "Surya",
+                                            "pid": "814",
+                                            "saddr": "11.0.0.127",
+                                            "sport": "42658"
+                                        },
+                                        "value": [
+                                            1755628406,
+                                            "1755578061.7225718"
+                                        ]
+                                    },
+                                    {
+                                        "metric": {
+                                            "anchorid": "anchor-125",
+                                            "daddr": "0.0.0.0",
+                                            "dport": "0",
+                                            "instance": "34.131.24.129:9091",
+                                            "job": "ebpf_udp",
+                                            "orgid": "Surya",
+                                            "pid": "814",
+                                            "saddr": "11.0.0.127",
+                                            "sport": "46626"
+                                        },
+                                        "value": [
+                                            1755628406,
+                                            "1755578061.195037"
+                                        ]
+                                    },
+                                    {
+                                        "metric": {
+                                            "anchorid": "anchor-125",
+                                            "daddr": "0.0.0.0",
+                                            "dport": "0",
+                                            "instance": "34.131.24.129:9091",
+                                            "job": "ebpf_udp",
+                                            "orgid": "Surya",
+                                            "pid": "814",
+                                            "saddr": "11.0.0.127",
+                                            "sport": "52385"
+                                        },
+                                        "value": [
+                                            1755628406,
+                                            "1755578060.715866"
+                                        ]
+                                    },
+                                    {
+                                        "metric": {
+                                            "anchorid": "anchor-125",
+                                            "daddr": "0.0.0.0",
+                                            "dport": "0",
+                                            "instance": "34.131.24.129:9091",
+                                            "job": "ebpf_udp",
+                                            "orgid": "Surya",
+                                            "pid": "814",
+                                            "saddr": "11.0.0.127",
+                                            "sport": "57905"
+                                        },
+                                        "value": [
+                                            1755628406,
+                                            "1755578062.0118053"
+                                        ]
+                                    },
+                                    {
+                                        "metric": {
+                                            "anchorid": "anchor-125",
+                                            "daddr": "0.0.0.0",
+                                            "dport": "0",
+                                            "instance": "34.131.24.129:9091",
+                                            "job": "ebpf_udp",
+                                            "orgid": "Surya",
+                                            "pid": "814",
+                                            "saddr": "11.0.0.127",
+                                            "sport": "59061"
+                                        },
+                                        "value": [
+                                            1755628406,
+                                            "1755578061.424748"
+                                        ]
+                                    },
+                                    {
+                                        "metric": {
+                                            "anchorid": "anchor-125",
+                                            "daddr": "11.0.0.127",
+                                            "dport": "13568",
+                                            "instance": "34.131.24.129:9091",
+                                            "job": "ebpf_udp",
+                                            "orgid": "Surya",
+                                            "pid": "2715",
+                                            "saddr": "1.0.0.127",
+                                            "sport": "39573"
+                                        },
+                                        "value": [
+                                            1755628406,
+                                            "1755578201.7811177"
+                                        ]
+                                    },
+                                    {
+                                        "metric": {
+                                            "anchorid": "anchor-125",
+                                            "daddr": "11.0.0.127",
+                                            "dport": "13568",
+                                            "instance": "34.131.24.129:9091",
+                                            "job": "ebpf_udp",
+                                            "orgid": "Surya",
+                                            "pid": "2715",
+                                            "saddr": "1.0.0.127",
+                                            "sport": "43700"
+                                        },
+                                        "value": [
+                                            1755628406,
+                                            "1755578201.7811546"
+                                        ]
+                                    },
+                                    {
+                                        "metric": {
+                                            "anchorid": "anchor-125",
+                                            "daddr": "11.0.0.127",
+                                            "dport": "13568",
+                                            "instance": "34.131.24.129:9091",
+                                            "job": "ebpf_udp",
+                                            "orgid": "Surya",
+                                            "pid": "2715",
+                                            "saddr": "1.0.0.127",
+                                            "sport": "47408"
+                                        },
+                                        "value": [
+                                            1755628406,
+                                            "1755578201.7815018"
+                                        ]
+                                    },
+                                    {
+                                        "metric": {
+                                            "anchorid": "anchor-125",
+                                            "daddr": "11.0.0.127",
+                                            "dport": "13568",
+                                            "instance": "34.131.24.129:9091",
+                                            "job": "ebpf_udp",
+                                            "orgid": "Surya",
+                                            "pid": "2715",
+                                            "saddr": "1.0.0.127",
+                                            "sport": "47495"
+                                        },
+                                        "value": [
+                                            1755628406,
+                                            "1755578201.7815008"
+                                        ]
+                                    },
+                                    {
+                                        "metric": {
+                                            "anchorid": "anchor-125",
+                                            "daddr": "254.169.254.169",
+                                            "dport": "13568",
+                                            "instance": "34.131.24.129:9091",
+                                            "job": "ebpf_udp",
+                                            "orgid": "Surya",
+                                            "pid": "210",
+                                            "saddr": "2.0.190.10",
+                                            "sport": "35390"
+                                        },
+                                        "value": [
+                                            1755628406,
+                                            "1755578257.9950917"
+                                        ]
+                                    },
+                                    {
+                                        "metric": {
+                                            "anchorid": "anchor-125",
+                                            "daddr": "254.169.254.169",
+                                            "dport": "13568",
+                                            "instance": "34.131.24.129:9091",
+                                            "job": "ebpf_udp",
+                                            "orgid": "Surya",
+                                            "pid": "210",
+                                            "saddr": "2.0.190.10",
+                                            "sport": "45508"
+                                        },
+                                        "value": [
+                                            1755628406,
+                                            "1755578257.9947648"
+                                        ]
+                                    },
+                                    {
+                                        "metric": {
+                                            "anchorid": "anchor-125",
+                                            "daddr": "254.169.254.169",
+                                            "dport": "13568",
+                                            "instance": "34.131.24.129:9091",
+                                            "job": "ebpf_udp",
+                                            "orgid": "Surya",
+                                            "pid": "210",
+                                            "saddr": "2.0.190.10",
+                                            "sport": "51498"
+                                        },
+                                        "value": [
+                                            1755628406,
+                                            "1755578257.9948022"
+                                        ]
+                                    },
+                                    {
+                                        "metric": {
+                                            "anchorid": "anchor-125",
+                                            "daddr": "254.169.254.169",
+                                            "dport": "13568",
+                                            "instance": "34.131.24.129:9091",
+                                            "job": "ebpf_udp",
+                                            "orgid": "Surya",
+                                            "pid": "210",
+                                            "saddr": "2.0.190.10",
+                                            "sport": "57434"
+                                        },
+                                        "value": [
+                                            1755628406,
+                                            "1755578257.9948874"
+                                        ]
+                                    },
+                                    {
+                                        "metric": {
+                                            "anchorid": "anchor-125",
+                                            "daddr": "53.0.0.127",
+                                            "dport": "13568",
+                                            "instance": "34.131.24.129:9091",
+                                            "job": "ebpf_udp",
+                                            "orgid": "Surya",
+                                            "pid": "631",
+                                            "saddr": "1.0.0.127",
+                                            "sport": "35440"
+                                        },
+                                        "value": [
+                                            1755628406,
+                                            "1755578257.9947498"
+                                        ]
+                                    },
+                                    {
+                                        "metric": {
+                                            "anchorid": "anchor-125",
+                                            "daddr": "53.0.0.127",
+                                            "dport": "13568",
+                                            "instance": "34.131.24.129:9091",
+                                            "job": "ebpf_udp",
+                                            "orgid": "Surya",
+                                            "pid": "631",
+                                            "saddr": "1.0.0.127",
+                                            "sport": "59801"
+                                        },
+                                        "value": [
+                                            1755628406,
+                                            "1755578257.9948504"
+                                        ]
+                                    }
+                                ]
+                            },
+                            "status": "up",
+                            "last_seen_up": "2025-08-19T18:33:26Z"
+                        }
+                    ]
+                },
+                {
+                    "panel_id": "UDP Session Drops (rate)",
+                    "queries": [
+                        {
+                            "promql": "rate(udp_session_drops_total{saddr=~\".*\",sport=~\".*\",daddr=~\".*\",dport=~\".*\",orgid=\"Surya\",anchorid=\"anchor-125\",instance=\"34.131.24.129:9091\",job=\"ebpf_udp\"}[5m])",
+                            "data": {
+                                "resultType": "vector",
+                                "result": [
+                                    {
+                                        "metric": {
+                                            "anchorid": "anchor-125",
+                                            "daddr": "0.0.0.0",
+                                            "dport": "0",
+                                            "instance": "34.131.24.129:9091",
+                                            "job": "ebpf_udp",
+                                            "orgid": "Surya",
+                                            "pid": "210",
+                                            "saddr": "53.0.0.127",
+                                            "sport": "53"
+                                        },
+                                        "value": [
+                                            1755628406,
+                                            "0"
+                                        ]
+                                    },
+                                    {
+                                        "metric": {
+                                            "anchorid": "anchor-125",
+                                            "daddr": "0.0.0.0",
+                                            "dport": "0",
+                                            "instance": "34.131.24.129:9091",
+                                            "job": "ebpf_udp",
+                                            "orgid": "Surya",
+                                            "pid": "814",
+                                            "saddr": "11.0.0.127",
+                                            "sport": "39421"
+                                        },
+                                        "value": [
+                                            1755628406,
+                                            "0"
+                                        ]
+                                    },
+                                    {
+                                        "metric": {
+                                            "anchorid": "anchor-125",
+                                            "daddr": "0.0.0.0",
+                                            "dport": "0",
+                                            "instance": "34.131.24.129:9091",
+                                            "job": "ebpf_udp",
+                                            "orgid": "Surya",
+                                            "pid": "814",
+                                            "saddr": "11.0.0.127",
+                                            "sport": "39772"
+                                        },
+                                        "value": [
+                                            1755628406,
+                                            "0"
+                                        ]
+                                    },
+                                    {
+                                        "metric": {
+                                            "anchorid": "anchor-125",
+                                            "daddr": "0.0.0.0",
+                                            "dport": "0",
+                                            "instance": "34.131.24.129:9091",
+                                            "job": "ebpf_udp",
+                                            "orgid": "Surya",
+                                            "pid": "814",
+                                            "saddr": "11.0.0.127",
+                                            "sport": "41184"
+                                        },
+                                        "value": [
+                                            1755628406,
+                                            "0"
+                                        ]
+                                    },
+                                    {
+                                        "metric": {
+                                            "anchorid": "anchor-125",
+                                            "daddr": "0.0.0.0",
+                                            "dport": "0",
+                                            "instance": "34.131.24.129:9091",
+                                            "job": "ebpf_udp",
+                                            "orgid": "Surya",
+                                            "pid": "814",
+                                            "saddr": "11.0.0.127",
+                                            "sport": "42658"
+                                        },
+                                        "value": [
+                                            1755628406,
+                                            "0.013333333333333334"
+                                        ]
+                                    },
+                                    {
+                                        "metric": {
+                                            "anchorid": "anchor-125",
+                                            "daddr": "0.0.0.0",
+                                            "dport": "0",
+                                            "instance": "34.131.24.129:9091",
+                                            "job": "ebpf_udp",
+                                            "orgid": "Surya",
+                                            "pid": "814",
+                                            "saddr": "11.0.0.127",
+                                            "sport": "46626"
+                                        },
+                                        "value": [
+                                            1755628406,
+                                            "0"
+                                        ]
+                                    },
+                                    {
+                                        "metric": {
+                                            "anchorid": "anchor-125",
+                                            "daddr": "0.0.0.0",
+                                            "dport": "0",
+                                            "instance": "34.131.24.129:9091",
+                                            "job": "ebpf_udp",
+                                            "orgid": "Surya",
+                                            "pid": "814",
+                                            "saddr": "11.0.0.127",
+                                            "sport": "52385"
+                                        },
+                                        "value": [
+                                            1755628406,
+                                            "0"
+                                        ]
+                                    },
+                                    {
+                                        "metric": {
+                                            "anchorid": "anchor-125",
+                                            "daddr": "0.0.0.0",
+                                            "dport": "0",
+                                            "instance": "34.131.24.129:9091",
+                                            "job": "ebpf_udp",
+                                            "orgid": "Surya",
+                                            "pid": "814",
+                                            "saddr": "11.0.0.127",
+                                            "sport": "57905"
+                                        },
+                                        "value": [
+                                            1755628406,
+                                            "0"
+                                        ]
+                                    },
+                                    {
+                                        "metric": {
+                                            "anchorid": "anchor-125",
+                                            "daddr": "0.0.0.0",
+                                            "dport": "0",
+                                            "instance": "34.131.24.129:9091",
+                                            "job": "ebpf_udp",
+                                            "orgid": "Surya",
+                                            "pid": "814",
+                                            "saddr": "11.0.0.127",
+                                            "sport": "59061"
+                                        },
+                                        "value": [
+                                            1755628406,
+                                            "0"
+                                        ]
+                                    },
+                                    {
+                                        "metric": {
+                                            "anchorid": "anchor-125",
+                                            "daddr": "11.0.0.127",
+                                            "dport": "13568",
+                                            "instance": "34.131.24.129:9091",
+                                            "job": "ebpf_udp",
+                                            "orgid": "Surya",
+                                            "pid": "2715",
+                                            "saddr": "1.0.0.127",
+                                            "sport": "39573"
+                                        },
+                                        "value": [
+                                            1755628406,
+                                            "0"
+                                        ]
+                                    },
+                                    {
+                                        "metric": {
+                                            "anchorid": "anchor-125",
+                                            "daddr": "11.0.0.127",
+                                            "dport": "13568",
+                                            "instance": "34.131.24.129:9091",
+                                            "job": "ebpf_udp",
+                                            "orgid": "Surya",
+                                            "pid": "2715",
+                                            "saddr": "1.0.0.127",
+                                            "sport": "43700"
+                                        },
+                                        "value": [
+                                            1755628406,
+                                            "0"
+                                        ]
+                                    },
+                                    {
+                                        "metric": {
+                                            "anchorid": "anchor-125",
+                                            "daddr": "11.0.0.127",
+                                            "dport": "13568",
+                                            "instance": "34.131.24.129:9091",
+                                            "job": "ebpf_udp",
+                                            "orgid": "Surya",
+                                            "pid": "2715",
+                                            "saddr": "1.0.0.127",
+                                            "sport": "47408"
+                                        },
+                                        "value": [
+                                            1755628406,
+                                            "0"
+                                        ]
+                                    },
+                                    {
+                                        "metric": {
+                                            "anchorid": "anchor-125",
+                                            "daddr": "11.0.0.127",
+                                            "dport": "13568",
+                                            "instance": "34.131.24.129:9091",
+                                            "job": "ebpf_udp",
+                                            "orgid": "Surya",
+                                            "pid": "2715",
+                                            "saddr": "1.0.0.127",
+                                            "sport": "47495"
+                                        },
+                                        "value": [
+                                            1755628406,
+                                            "0"
+                                        ]
+                                    },
+                                    {
+                                        "metric": {
+                                            "anchorid": "anchor-125",
+                                            "daddr": "254.169.254.169",
+                                            "dport": "13568",
+                                            "instance": "34.131.24.129:9091",
+                                            "job": "ebpf_udp",
+                                            "orgid": "Surya",
+                                            "pid": "210",
+                                            "saddr": "2.0.190.10",
+                                            "sport": "35390"
+                                        },
+                                        "value": [
+                                            1755628406,
+                                            "0"
+                                        ]
+                                    },
+                                    {
+                                        "metric": {
+                                            "anchorid": "anchor-125",
+                                            "daddr": "254.169.254.169",
+                                            "dport": "13568",
+                                            "instance": "34.131.24.129:9091",
+                                            "job": "ebpf_udp",
+                                            "orgid": "Surya",
+                                            "pid": "210",
+                                            "saddr": "2.0.190.10",
+                                            "sport": "45508"
+                                        },
+                                        "value": [
+                                            1755628406,
+                                            "0"
+                                        ]
+                                    },
+                                    {
+                                        "metric": {
+                                            "anchorid": "anchor-125",
+                                            "daddr": "254.169.254.169",
+                                            "dport": "13568",
+                                            "instance": "34.131.24.129:9091",
+                                            "job": "ebpf_udp",
+                                            "orgid": "Surya",
+                                            "pid": "210",
+                                            "saddr": "2.0.190.10",
+                                            "sport": "51498"
+                                        },
+                                        "value": [
+                                            1755628406,
+                                            "0"
+                                        ]
+                                    },
+                                    {
+                                        "metric": {
+                                            "anchorid": "anchor-125",
+                                            "daddr": "254.169.254.169",
+                                            "dport": "13568",
+                                            "instance": "34.131.24.129:9091",
+                                            "job": "ebpf_udp",
+                                            "orgid": "Surya",
+                                            "pid": "210",
+                                            "saddr": "2.0.190.10",
+                                            "sport": "57434"
+                                        },
+                                        "value": [
+                                            1755628406,
+                                            "0"
+                                        ]
+                                    },
+                                    {
+                                        "metric": {
+                                            "anchorid": "anchor-125",
+                                            "daddr": "53.0.0.127",
+                                            "dport": "13568",
+                                            "instance": "34.131.24.129:9091",
+                                            "job": "ebpf_udp",
+                                            "orgid": "Surya",
+                                            "pid": "631",
+                                            "saddr": "1.0.0.127",
+                                            "sport": "35440"
+                                        },
+                                        "value": [
+                                            1755628406,
+                                            "0"
+                                        ]
+                                    },
+                                    {
+                                        "metric": {
+                                            "anchorid": "anchor-125",
+                                            "daddr": "53.0.0.127",
+                                            "dport": "13568",
+                                            "instance": "34.131.24.129:9091",
+                                            "job": "ebpf_udp",
+                                            "orgid": "Surya",
+                                            "pid": "631",
+                                            "saddr": "1.0.0.127",
+                                            "sport": "59801"
+                                        },
+                                        "value": [
+                                            1755628406,
+                                            "0"
+                                        ]
+                                    }
+                                ]
+                            },
+                            "status": "up",
+                            "last_seen_up": "2025-08-19T18:33:26Z"
+                        }
+                    ]
+                },
+                {
+                    "panel_id": "UDP Session Duration (avg seconds)",
+                    "queries": [
+                        {
+                            "promql": "avg(udp_session_duration_seconds{saddr=~\".*\",sport=~\".*\",daddr=~\".*\",dport=~\".*\",orgid=\"Surya\",anchorid=\"anchor-125\",instance=\"34.131.24.129:9091\",job=\"ebpf_udp\"}) by (saddr,sport,daddr,dport)",
+                            "data": {
+                                "resultType": "vector",
+                                "result": [
+                                    {
+                                        "metric": {
+                                            "daddr": "0.0.0.0",
+                                            "dport": "0",
+                                            "saddr": "11.0.0.127",
+                                            "sport": "39421"
+                                        },
+                                        "value": [
+                                            1755628406,
+                                            "242.082989261"
+                                        ]
+                                    },
+                                    {
+                                        "metric": {
+                                            "daddr": "0.0.0.0",
+                                            "dport": "0",
+                                            "saddr": "11.0.0.127",
+                                            "sport": "39772"
+                                        },
+                                        "value": [
+                                            1755628406,
+                                            "244.087242558"
+                                        ]
+                                    },
+                                    {
+                                        "metric": {
+                                            "daddr": "0.0.0.0",
+                                            "dport": "0",
+                                            "saddr": "11.0.0.127",
+                                            "sport": "41184"
+                                        },
+                                        "value": [
+                                            1755628406,
+                                            "244.070822517"
+                                        ]
+                                    },
+                                    {
+                                        "metric": {
+                                            "daddr": "0.0.0.0",
+                                            "dport": "0",
+                                            "saddr": "11.0.0.127",
+                                            "sport": "42658"
+                                        },
+                                        "value": [
+                                            1755628406,
+                                            "242.937662175"
+                                        ]
+                                    },
+                                    {
+                                        "metric": {
+                                            "daddr": "0.0.0.0",
+                                            "dport": "0",
+                                            "saddr": "11.0.0.127",
+                                            "sport": "46626"
+                                        },
+                                        "value": [
+                                            1755628406,
+                                            "244.080068388"
+                                        ]
+                                    },
+                                    {
+                                        "metric": {
+                                            "daddr": "0.0.0.0",
+                                            "dport": "0",
+                                            "saddr": "11.0.0.127",
+                                            "sport": "52385"
+                                        },
+                                        "value": [
+                                            1755628406,
+                                            "244.0795796269"
+                                        ]
+                                    },
+                                    {
+                                        "metric": {
+                                            "daddr": "0.0.0.0",
+                                            "dport": "0",
+                                            "saddr": "11.0.0.127",
+                                            "sport": "57905"
+                                        },
+                                        "value": [
+                                            1755628406,
+                                            "244.078308217"
+                                        ]
+                                    },
+                                    {
+                                        "metric": {
+                                            "daddr": "0.0.0.0",
+                                            "dport": "0",
+                                            "saddr": "11.0.0.127",
+                                            "sport": "59061"
+                                        },
+                                        "value": [
+                                            1755628406,
+                                            "244.086132528"
+                                        ]
+                                    },
+                                    {
+                                        "metric": {
+                                            "daddr": "0.0.0.0",
+                                            "dport": "0",
+                                            "saddr": "53.0.0.127",
+                                            "sport": "53"
+                                        },
+                                        "value": [
+                                            1755628406,
+                                            "0.00565162"
+                                        ]
+                                    },
+                                    {
+                                        "metric": {
+                                            "daddr": "11.0.0.127",
+                                            "dport": "13568",
+                                            "saddr": "1.0.0.127",
+                                            "sport": "39573"
+                                        },
+                                        "value": [
+                                            1755628406,
+                                            "0.000236961"
+                                        ]
+                                    },
+                                    {
+                                        "metric": {
+                                            "daddr": "11.0.0.127",
+                                            "dport": "13568",
+                                            "saddr": "1.0.0.127",
+                                            "sport": "43700"
+                                        },
+                                        "value": [
+                                            1755628406,
+                                            "0.000202591"
+                                        ]
+                                    },
+                                    {
+                                        "metric": {
+                                            "daddr": "11.0.0.127",
+                                            "dport": "13568",
+                                            "saddr": "1.0.0.127",
+                                            "sport": "47408"
+                                        },
+                                        "value": [
+                                            1755628406,
+                                            "0.00052999"
+                                        ]
+                                    },
+                                    {
+                                        "metric": {
+                                            "daddr": "11.0.0.127",
+                                            "dport": "13568",
+                                            "saddr": "1.0.0.127",
+                                            "sport": "47495"
+                                        },
+                                        "value": [
+                                            1755628406,
+                                            "0.000554941"
+                                        ]
+                                    },
+                                    {
+                                        "metric": {
+                                            "daddr": "254.169.254.169",
+                                            "dport": "13568",
+                                            "saddr": "2.0.190.10",
+                                            "sport": "35390"
+                                        },
+                                        "value": [
+                                            1755628406,
+                                            "0.00521116"
+                                        ]
+                                    },
+                                    {
+                                        "metric": {
+                                            "daddr": "254.169.254.169",
+                                            "dport": "13568",
+                                            "saddr": "2.0.190.10",
+                                            "sport": "45508"
+                                        },
+                                        "value": [
+                                            1755628406,
+                                            "0.00545045"
+                                        ]
+                                    },
+                                    {
+                                        "metric": {
+                                            "daddr": "254.169.254.169",
+                                            "dport": "13568",
+                                            "saddr": "2.0.190.10",
+                                            "sport": "51498"
+                                        },
+                                        "value": [
+                                            1755628406,
+                                            "0.005268259"
+                                        ]
+                                    },
+                                    {
+                                        "metric": {
+                                            "daddr": "254.169.254.169",
+                                            "dport": "13568",
+                                            "saddr": "2.0.190.10",
+                                            "sport": "57434"
+                                        },
+                                        "value": [
+                                            1755628406,
+                                            "0.00522724"
+                                        ]
+                                    },
+                                    {
+                                        "metric": {
+                                            "daddr": "53.0.0.127",
+                                            "dport": "13568",
+                                            "saddr": "1.0.0.127",
+                                            "sport": "35440"
+                                        },
+                                        "value": [
+                                            1755628406,
+                                            "0.00587648"
+                                        ]
+                                    },
+                                    {
+                                        "metric": {
+                                            "daddr": "53.0.0.127",
+                                            "dport": "13568",
+                                            "saddr": "1.0.0.127",
+                                            "sport": "59801"
+                                        },
+                                        "value": [
+                                            1755628406,
+                                            "0.00588912"
+                                        ]
+                                    }
+                                ]
+                            },
+                            "status": "up",
+                            "last_seen_up": "2025-08-19T18:33:26Z"
+                        }
+                    ]
+                },
+                {
+                    "panel_id": "UDP TX/RX Bytes (rate in Bps)",
+                    "queries": [
+                        {
+                            "promql": "sum(rate(udp_rx_bytes_total{saddr=~\".*\",sport=~\".*\",daddr=~\".*\",dport=~\".*\",orgid=\"Surya\",anchorid=\"anchor-125\",instance=\"34.131.24.129:9091\",job=\"ebpf_udp\"}[5m])) + sum(rate(udp_tx_bytes_total{saddr=~\".*\",sport=~\".*\",daddr=~\".*\",dport=~\".*\",orgid=\"Surya\",anchorid=\"anchor-125\",instance=\"34.131.24.129:9091\",job=\"ebpf_udp\"}[5m]))",
+                            "data": {
+                                "resultType": "vector",
+                                "result": [
+                                    {
+                                        "metric": {},
+                                        "value": [
+                                            1755628406,
+                                            "1713.6799999999998"
+                                        ]
+                                    }
+                                ]
+                            },
+                            "status": "up",
+                            "last_seen_up": "2025-08-19T18:33:26Z"
+                        }
+                    ]
+                },
+                {
+                    "panel_id": "UDP TX/RX Packets (rate)",
+                    "queries": [
+                        {
+                            "promql": "sum(rate(udp_rx_packets_total{saddr=~\".*\",sport=~\".*\",daddr=~\".*\",dport=~\".*\",orgid=\"Surya\",anchorid=\"anchor-125\",instance=\"34.131.24.129:9091\",job=\"ebpf_udp\"}[5m])) + sum(rate(udp_tx_packets_total{saddr=~\".*\",sport=~\".*\",daddr=~\".*\",dport=~\".*\",orgid=\"Surya\",anchorid=\"anchor-125\",instance=\"34.131.24.129:9091\",job=\"ebpf_udp\"}[5m]))",
+                            "data": {
+                                "resultType": "vector",
+                                "result": [
+                                    {
+                                        "metric": {},
+                                        "value": [
+                                            1755628406,
+                                            "3.3266666666666667"
+                                        ]
+                                    }
+                                ]
+                            },
+                            "status": "up",
+                            "last_seen_up": "2025-08-19T18:33:26Z"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "group_name": "UDP Session Summary",
+            "panels": [
+                {
+                    "panel_id": "UDP Session Duration Sec",
+                    "queries": [
+                        {
+                            "promql": "max(udp_session_duration_seconds{saddr=~\".*\",daddr=~\".*\",sport=~\".*\",dport=~\".*\",orgid=\"Surya\",anchorid=\"anchor-125\",instance=\"34.131.24.129:9091\",job=\"ebpf_udp\"})",
+                            "data": {
+                                "resultType": "vector",
+                                "result": [
+                                    {
+                                        "metric": {},
+                                        "value": [
+                                            1755628406,
+                                            "244.087242558"
+                                        ]
+                                    }
+                                ]
+                            },
+                            "status": "up",
+                            "last_seen_up": "2025-08-19T18:33:26Z"
+                        }
+                    ]
+                },
+                {
+                    "panel_id": "UDP Active Sessions",
+                    "queries": [
+                        {
+                            "promql": "udp_active_sessions{saddr=~\".*\",daddr=~\".*\",sport=~\".*\",dport=~\".*\",orgid=\"Surya\",anchorid=\"anchor-125\",instance=\"34.131.24.129:9091\",job=\"ebpf_udp\"}",
+                            "data": {
+                                "resultType": "vector",
+                                "result": [
+                                    {
+                                        "metric": {
+                                            "__name__": "udp_active_sessions",
+                                            "anchorid": "anchor-125",
+                                            "instance": "34.131.24.129:9091",
+                                            "job": "ebpf_udp",
+                                            "orgid": "Surya"
+                                        },
+                                        "value": [
+                                            1755628406,
+                                            "19"
+                                        ]
+                                    }
+                                ]
+                            },
+                            "status": "up",
+                            "last_seen_up": "2025-08-19T18:33:26Z"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

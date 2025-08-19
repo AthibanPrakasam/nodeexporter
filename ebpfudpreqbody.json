@@ -155,3 +155,25 @@
       }
     ]
   }
+
+  {
+    "type": "update_filters",
+    "filters": {
+      "orgid": "Surya",
+      "anchorid": "anchor-125",
+      "instance": "34.131.24.129:9091",
+      "job": "ebpf_udp",
+      "saddr": [
+        ".*"
+      ],
+      "sport": [
+        ".*"
+      ],
+      "daddr": [
+        ".*"
+      ],
+      "dport": [
+        ".*"
+      ]
+    }
+  }
