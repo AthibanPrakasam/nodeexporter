@@ -1,0 +1,157 @@
+{
+    "type": "init",
+    "dashboard_id": "ebpf_dashboard",
+    "interval": 5,
+    "filters": {
+      "orgid": "Surya",
+      "anchorid": "anchor-125",
+      "instance": "34.131.24.129:9091",
+      "job": "ebpf_udp",
+      "saddr": [
+        ".*"
+      ],
+      "sport": [
+        ".*"
+      ],
+      "daddr": [
+        ".*"
+      ],
+      "dport": [
+        ".*"
+      ]
+    },
+    "groups": [
+      {
+        "group_name": "UDP_Error/Drops Insight",
+        "panels": [
+          {
+            "panel_id": "Total UDP Drops",
+            "queries": [
+              {
+                "custom_expression": "sum(udp_drops_total{saddr=~\"$saddr\",sport=~\"$sport\",daddr=~\"$daddr\",dport=~\"$dport\",orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",job=\"$job\"})"
+              }
+            ]
+          },
+          {
+            "panel_id": "UDP Session Drops per Destination",
+            "queries": [
+              {
+                "custom_expression": "sum(rate(udp_session_drops_total{saddr=~\"$saddr\",sport=~\"$sport\",daddr=~\"$daddr\",dport=~\"$dport\",orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",job=\"$job\"}[5m])) by (daddr, dport)"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "group_name": "UDP_Top N Views",
+        "panels": [
+          {
+            "panel_id": "Top 10 Destination Ports by Bytes",
+            "queries": [
+              {
+                "custom_expression": "topk(10, sum(rate(udp_rx_bytes_total{saddr=~\"$saddr\",sport=~\"$sport\",daddr=~\"$daddr\",dport=~\"$dport\",orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",job=\"$job\"}[5m])) by (dport))"
+              }
+            ]
+          },
+          {
+            "panel_id": "Top 10 Source IPs by Packets",
+            "queries": [
+              {
+                "custom_expression": "topk(10, sum(rate(udp_tx_packets_total{saddr=~\"$saddr\",sport=~\"$sport\",daddr=~\"$daddr\",dport=~\"$dport\",orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",job=\"$job\"}[5m])) by (saddr))"
+              }
+            ]
+          },
+          {
+            "panel_id": "Top Processes by Traffic (PID Breakdown)",
+            "queries": [
+              {
+                "custom_expression": "topk(10, sum(rate(udp_rx_bytes_total{saddr=~\"$saddr\",sport=~\"$sport\",daddr=~\"$daddr\",dport=~\"$dport\",orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",job=\"$job\"}[5m])) by (pid)) or topk(10, sum(rate(udp_tx_bytes_total{saddr=~\"$saddr\",sport=~\"$sport\",daddr=~\"$daddr\",dport=~\"$dport\",orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",job=\"$job\"}[5m])) by (pid))"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "group_name": "UDP Traffic Overview",
+        "panels": [
+          {
+            "panel_id": "UDP Session Duration Sec",
+            "queries": [
+              {
+                "custom_expression": "max(udp_session_duration_seconds{saddr=~\"$saddr\",sport=~\"$sport\",daddr=~\"$daddr\",dport=~\"$dport\",orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",job=\"$job\"})"
+              }
+            ]
+          },
+          {
+            "panel_id": "UDP Active Sessions",
+            "queries": [
+              {
+                "custom_expression": "sum(udp_active_sessions{saddr=~\"$saddr\",sport=~\"$sport\",daddr=~\"$daddr\",dport=~\"$dport\",orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",job=\"$job\"})"
+              }
+            ]
+          },
+          {
+            "panel_id": "UDP Session Last Seen (seconds ago)",
+            "queries": [
+              {
+                "custom_expression": "time() - udp_session_last_seen_seconds{saddr=~\"$saddr\",sport=~\"$sport\",daddr=~\"$daddr\",dport=~\"$dport\",orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",job=\"$job\"}"
+              }
+            ]
+          },
+          {
+            "panel_id": "UDP Session Drops (rate)",
+            "queries": [
+              {
+                "custom_expression": "rate(udp_session_drops_total{saddr=~\"$saddr\",sport=~\"$sport\",daddr=~\"$daddr\",dport=~\"$dport\",orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",job=\"$job\"}[5m])"
+              }
+            ]
+          },
+          {
+            "panel_id": "UDP Session Duration (avg seconds)",
+            "queries": [
+              {
+                "custom_expression": "avg(udp_session_duration_seconds{saddr=~\"$saddr\",sport=~\"$sport\",daddr=~\"$daddr\",dport=~\"$dport\",orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",job=\"$job\"}) by (saddr,sport,daddr,dport)"
+              }
+            ]
+          },
+          {
+            "panel_id": "UDP TX/RX Bytes (rate in Bps)",
+            "queries": [
+              {
+                "custom_expression": "sum(rate(udp_rx_bytes_total{saddr=~\"$saddr\",sport=~\"$sport\",daddr=~\"$daddr\",dport=~\"$dport\",orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",job=\"$job\"}[5m])) + sum(rate(udp_tx_bytes_total{saddr=~\"$saddr\",sport=~\"$sport\",daddr=~\"$daddr\",dport=~\"$dport\",orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",job=\"$job\"}[5m]))"
+              }
+            ]
+          },
+          {
+            "panel_id": "UDP TX/RX Packets (rate)",
+            "queries": [
+              {
+                "custom_expression": "sum(rate(udp_rx_packets_total{saddr=~\"$saddr\",sport=~\"$sport\",daddr=~\"$daddr\",dport=~\"$dport\",orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",job=\"$job\"}[5m])) + sum(rate(udp_tx_packets_total{saddr=~\"$saddr\",sport=~\"$sport\",daddr=~\"$daddr\",dport=~\"$dport\",orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",job=\"$job\"}[5m]))"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "group_name": "UDP Session Summary",
+        "panels": [
+          {
+            "panel_id": "UDP Session Duration Sec",
+            "queries": [
+              {
+                "custom_expression": "max(udp_session_duration_seconds{saddr=~\"$saddr\",daddr=~\"$daddr\",sport=~\"$sport\",dport=~\"$dport\",orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",job=\"$job\"})"
+              }
+            ]
+          },
+          {
+            "panel_id": "UDP Active Sessions",
+            "queries": [
+              {
+                "custom_expression": "udp_active_sessions{saddr=~\"$saddr\",daddr=~\"$daddr\",sport=~\"$sport\",dport=~\"$dport\",orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",job=\"$job\"}"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }

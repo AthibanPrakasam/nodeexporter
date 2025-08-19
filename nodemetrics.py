@@ -1,4 +1,3 @@
-
 # --- Optimized Changes Applied ---
 # Note: All route paths remain unchanged
 # Optimizations include:
@@ -145,7 +144,7 @@ async def get_job_status(
     try:
         response = await session.get(f"{VICTORIA_BASE_URL}/api/v1/query", params={"query": promql})
         response.raise_for_status()
-        data = response.json()
+        data = await response.json()
     except httpx.RequestError as e:
         raise HTTPException(status_code=502, detail=f"Request failed: {str(e)}")
     except ValueError:
@@ -200,7 +199,7 @@ async def get_job_status(
                 params={"match[]": f'container_cpu_usage_seconds_total{match_str}'}
             )
             series_response.raise_for_status()
-            series_data = series_response.json().get("data", [])
+            series_data = await series_response.json().get("data", [])
 
             for item in series_data:
                 inst = item.get("instance")
@@ -303,7 +302,7 @@ async def websocket_metrics_query(websocket: WebSocket):
 # Cache for query results (TTL: 2 seconds)
 query_cache = TTLCache(maxsize=100, ttl=2)
 
-@app.websocket("/ws/metrics/dashboard")
+@app.websocket("/ws/metrics/ebpfdashboard")
 async def websocket_dashboard(websocket: WebSocket):
     await websocket.accept()
     config = {"dashboard_id": None, "interval": 10, "filters": {}, "groups": []}
@@ -500,7 +499,7 @@ async def fetch_label_values(label: str, filters: dict, dependent_filters: dict 
 # ------------------------------
 # WebSocket dashboard handler
 # ------------------------------
-@app.websocket("/ws/metrics/ebpfdashboard")
+@app.websocket("/ws/metrics/dashboard")
 async def websocket_dashboard(websocket: WebSocket):
     await websocket.accept()
     config = {"dashboard_id": None, "interval": 10, "filters": {}, "groups": []}

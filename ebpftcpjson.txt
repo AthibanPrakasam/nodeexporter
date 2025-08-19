@@ -37,7 +37,7 @@
     ]
   },
   "groups": [
-        {
+    {
       "group_name": "Exporter Health",
       "panels": [
         {
@@ -50,7 +50,7 @@
         }
       ]
     },
-        {
+    {
       "group_name": "Overall Health",
       "panels": [
         {
@@ -71,14 +71,22 @@
         }
       ]
     },
-        {
+    {
       "group_name": "Window Management & Congestion Control",
       "panels": [
+        {
+          "panel_id": "Advertised Window (Bytes)",
+          "queries": [
+            {
+              "custom_expression": "avg(tcp_advertised_window_bytes{orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",job=\"$job\",saddr=~\"$saddr\", sport=~\"$sport\", daddr=~\"$daddr\", dport=~\"$dport\"}) by (saddr, daddr, sport, dport)"
+            }
+          ]
+        },
         {
           "panel_id": "Average Send Congestion Window (Bytes) 📊",
           "queries": [
             {
-              "custom_expression": "avg(tcp_send_cwnd_bytes{orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",saddr=~\"$saddr\",sport=~\"$sport\",daddr=~\"$daddr\",dport=~\"$dport\",job=\"$job\"}) by (saddr, daddr, sport, dport)"
+              "custom_expression": "avg(tcp_send_cwnd_bytes{orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",saddr=~\"$saddr\",sport=~\"$sport\",daddr=~\"$daddr\",dport=~\"$dport\",job=\"$job\"}) by (saddr,daddr,sport,dport)"
             }
           ]
         },
@@ -86,7 +94,7 @@
           "panel_id": "Average Receive Window (Bytes) 📥",
           "queries": [
             {
-              "custom_expression": "avg(tcp_receive_window_bytes{orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",saddr=~\"$saddr\",sport=~\"$sport\",daddr=~\"$daddr\",dport=~\"$dport\",job=\"$job\"}) by (saddr, daddr, sport, dport)"
+              "custom_expression": "avg(tcp_receive_window_bytes{orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",saddr=~\"$saddr\",sport=~\"$sport\",daddr=~\"$daddr\",dport=~\"$dport\",job=\"$job\"}) by (saddr,daddr,sport,dport)"
             }
           ]
         },
@@ -94,7 +102,44 @@
           "panel_id": "Average Slow Start Threshold (Bytes) 📈",
           "queries": [
             {
-              "custom_expression": "avg(tcp_slow_start_threshold{orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",saddr=~\"$saddr\",sport=~\"$sport\",daddr=~\"$daddr\",dport=~\"$dport\",job=\"$job\"}) by (saddr, daddr, sport, dport)"
+              "custom_expression": "avg(tcp_slow_start_threshold{orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",saddr=~\"$saddr\",sport=~\"$sport\",daddr=~\"$daddr\",dport=~\"$dport\",job=\"$job\"}) by (saddr,daddr,sport,dport)"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "group_name": "TCP Window Scaling",
+      "panels": [
+        {
+          "panel_id": "TCP Window Scaling Enabled ✅❌",
+          "queries": [
+            {
+              "custom_expression": "max((tcp_session_wnd_scale{orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",job=\"$job\",saddr=~\"$saddr\",sport=~\"$sport\",daddr=~\"$daddr\",dport=~\"$dport\"} % 128 > bool 0) * 1) by (saddr,daddr,sport,dport)"
+            }
+          ]
+        },
+        {
+          "panel_id": "TCP Window Scale Factor (Shift Bits) 🔢",
+          "queries": [
+            {
+              "custom_expression": "avg(tcp_session_wnd_scale{orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",job=\"$job\",saddr=~\"$saddr\",sport=~\"$sport\",daddr=~\"$daddr\",dport=~\"$dport\"} % 128) by (saddr,daddr,sport,dport)"
+            }
+          ]
+        },
+        {
+          "panel_id": "Connections Without Scaling 🚫",
+          "queries": [
+            {
+              "custom_expression": "max((tcp_session_wnd_scale{orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",job=\"$job\",saddr=~\"$saddr\",sport=~\"$sport\",daddr=~\"$daddr\",dport=~\"$dport\"} % 128 == bool 0) * 1) by (saddr,daddr,sport,dport)"
+            }
+          ]
+        },
+        {
+          "panel_id": "Effective Send Window (Bytes) 📐",
+          "queries": [
+            {
+              "custom_expression": "avg((tcp_send_cwnd_bytes{orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",job=\"$job\",saddr=~\"$saddr\",sport=~\"$sport\",daddr=~\"$daddr\",dport=~\"$dport\"}) * (2 ^ (tcp_session_wnd_scale{orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",job=\"$job\",saddr=~\"$saddr\",sport=~\"$sport\",daddr=~\"$daddr\",dport=~\"$dport\"} % 128))) by (saddr,daddr,sport,dport)"
             }
           ]
         }
@@ -107,7 +152,7 @@
           "panel_id": "SACK Segments 📌",
           "queries": [
             {
-              "custom_expression": "rate(tcp_sacked_segments{saddr=~\"$saddr\", sport=~\"$sport\", daddr=~\"$daddr\", dport=~\"$dport\",orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",job=\"$job\"}[5m])"
+              "custom_expression": "sum(rate(tcp_sacked_segments{saddr=~\"$saddr\",sport=~\"$sport\",daddr=~\"$daddr\",dport=~\"$dport\",orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",job=\"$job\"}[1m]))"
             }
           ]
         },
@@ -115,7 +160,7 @@
           "panel_id": "DSACK Duplicate Acknowledgments 🧩",
           "queries": [
             {
-              "custom_expression": "sum(rate(tcp_dsack_duplicate_acks{saddr=~\"$saddr\", sport=~\"$sport\", daddr=~\"$daddr\", dport=~\"$dport\",orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",job=\"$job\"}[5m]))"
+              "custom_expression": "sum(rate(tcp_dsack_duplicate_acks{saddr=~\"$saddr\",sport=~\"$sport\",daddr=~\"$daddr\",dport=~\"$dport\",orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",job=\"$job\"}[1m]))"
             }
           ]
         }
@@ -128,7 +173,7 @@
           "panel_id": "Segments Sent (Rate) 📡",
           "queries": [
             {
-              "custom_expression": "rate(tcp_segments_out_total{saddr=~\"$saddr\", sport=~\"$sport\", daddr=~\"$daddr\", dport=~\"$dport\",orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",job=\"$job\"}[5m])"
+              "custom_expression": "sum(rate(tcp_segments_out_total{saddr=~\"$saddr\",sport=~\"$sport\",daddr=~\"$daddr\",dport=~\"$dport\",orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",job=\"$job\"}[1m]))"
             }
           ]
         },
@@ -136,7 +181,7 @@
           "panel_id": "Segments Received (Rate) 📥",
           "queries": [
             {
-              "custom_expression": "rate(tcp_segments_in_total{saddr=~\"$saddr\", sport=~\"$sport\", daddr=~\"$daddr\", dport=~\"$dport\",orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",job=\"$job\"}[5m])"
+              "custom_expression": "sum(rate(tcp_segments_in_total{saddr=~\"$saddr\",sport=~\"$sport\",daddr=~\"$daddr\",dport=~\"$dport\",orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",job=\"$job\"}[1m]))"
             }
           ]
         },
@@ -144,7 +189,7 @@
           "panel_id": "Bytes Acknowledged (Rate) ✅",
           "queries": [
             {
-              "custom_expression": "rate(tcp_bytes_acked_total{saddr=~\"$saddr\", sport=~\"$sport\", daddr=~\"$daddr\", dport=~\"$dport\",orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",job=\"$job\"}[5m])"
+              "custom_expression": "sum(rate(tcp_bytes_acked_total{saddr=~\"$saddr\",sport=~\"$sport\",daddr=~\"$daddr\",dport=~\"$dport\",orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",job=\"$job\"}[1m]))"
             }
           ]
         },
@@ -152,7 +197,7 @@
           "panel_id": "Unacknowledged Segments 📈",
           "queries": [
             {
-              "custom_expression": "avg(tcp_unacked_segments{saddr=~\"$saddr\", sport=~\"$sport\", daddr=~\"$daddr\", dport=~\"$dport\",orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",job=\"$job\"}) by (saddr, daddr, sport, dport)"
+              "custom_expression": "avg(tcp_unacked_segments{saddr=~\"$saddr\",sport=~\"$sport\",daddr=~\"$daddr\",dport=~\"$dport\",orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",job=\"$job\"}) by (saddr,daddr,sport,dport)"
             }
           ]
         },
@@ -160,7 +205,7 @@
           "panel_id": "Segments In/Out Ratio ➡️⬅️",
           "queries": [
             {
-              "custom_expression": "sum(rate(tcp_segments_out_total{saddr=~\"$saddr\", sport=~\"$sport\", daddr=~\"$daddr\", dport=~\"$dport\",orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",job=\"$job\"}[5m])) / sum(rate(tcp_segments_in_total{saddr=~\"$saddr\", sport=~\"$sport\", daddr=~\"$daddr\", dport=~\"$dport\",orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",job=\"$job\"}[5m]))"
+              "custom_expression": "sum(rate(tcp_segments_out_total{saddr=~\"$saddr\",sport=~\"$sport\",daddr=~\"$daddr\",dport=~\"$dport\",orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",job=\"$job\"}[1m])) / sum(rate(tcp_segments_in_total{saddr=~\"$saddr\",sport=~\"$sport\",daddr=~\"$daddr\",dport=~\"$dport\",orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",job=\"$job\"}[1m]))"
             }
           ]
         }
@@ -173,7 +218,7 @@
           "panel_id": "Last Seen Session Timestamp (Seconds) 🕰️",
           "queries": [
             {
-              "custom_expression": "tcp_session_last_seen_seconds{saddr=~\"$saddr\", sport=~\"$sport\", daddr=~\"$daddr\", dport=~\"$dport\",orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",job=\"$job\"}"
+              "custom_expression": "tcp_session_last_seen_seconds{saddr=~\"$saddr\",sport=~\"$sport\",daddr=~\"$daddr\",dport=~\"$dport\",orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",job=\"$job\"}"
             }
           ]
         },
@@ -181,7 +226,7 @@
           "panel_id": "Session Events (Rate) 🔔",
           "queries": [
             {
-              "custom_expression": "rate(tcp_session_event_count{saddr=~\"$saddr\", sport=~\"$sport\", daddr=~\"$daddr\", dport=~\"$dport\",orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",job=\"$job\"}[5m])"
+              "custom_expression": "sum(rate(tcp_session_event_count{saddr=~\"$saddr\",sport=~\"$sport\",daddr=~\"$daddr\",dport=~\"$dport\",orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",job=\"$job\"}[1m]))"
             }
           ]
         }
@@ -194,7 +239,7 @@
           "panel_id": "Retransmission Timeout (ms) ⌛",
           "queries": [
             {
-              "custom_expression": "avg(tcp_retransmission_timeout_milliseconds{saddr=~\"$saddr\", sport=~\"$sport\", daddr=~\"$daddr\", dport=~\"$dport\",orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",job=\"$job\"})"
+              "custom_expression": "avg(tcp_retransmission_timeout_milliseconds{saddr=~\"$saddr\",sport=~\"$sport\",daddr=~\"$daddr\",dport=~\"$dport\",orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",job=\"$job\"})"
             }
           ]
         },
@@ -202,7 +247,7 @@
           "panel_id": "RTT Variance (Jitter) 📊",
           "queries": [
             {
-              "custom_expression": "avg(tcp_rtt_variance_microseconds{saddr=~\"$saddr\", sport=~\"$sport\", daddr=~\"$daddr\", dport=~\"$dport\",orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",job=\"$job\"}) by (saddr, daddr, sport, dport)"
+              "custom_expression": "avg(tcp_rtt_variance_microseconds{saddr=~\"$saddr\",sport=~\"$sport\",daddr=~\"$daddr\",dport=~\"$dport\",orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",job=\"$job\"}) by (saddr,daddr,sport,dport)"
             }
           ]
         },
@@ -210,7 +255,7 @@
           "panel_id": "Smoothed Round Trip Time (SRTT) (Microseconds) ⏱️",
           "queries": [
             {
-              "custom_expression": "avg(tcp_srtt_microseconds{saddr=~\"$saddr\", sport=~\"$sport\", daddr=~\"$daddr\", dport=~\"$dport\",orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",job=\"$job\"}) by (saddr, daddr, sport, dport)"
+              "custom_expression": "avg(tcp_srtt_microseconds{saddr=~\"$saddr\",sport=~\"$sport\",daddr=~\"$daddr\",dport=~\"$dport\",orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",job=\"$job\"}) by (saddr,daddr,sport,dport)"
             }
           ]
         }
@@ -223,7 +268,7 @@
           "panel_id": "Total Retransmissions (Rate) 🔁",
           "queries": [
             {
-              "custom_expression": "rate(tcp_total_retransmits_total{saddr=~\"$saddr\", sport=~\"$sport\", daddr=~\"$daddr\", dport=~\"$dport\",orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",job=\"$job\"}[5m])"
+              "custom_expression": "sum(rate(tcp_total_retransmits_total{saddr=~\"$saddr\",sport=~\"$sport\",daddr=~\"$daddr\",dport=~\"$dport\",orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",job=\"$job\"}[1m]))"
             }
           ]
         },
@@ -231,7 +276,7 @@
           "panel_id": "Bytes Retransmitted (Rate) 🔄",
           "queries": [
             {
-              "custom_expression": "rate(tcp_bytes_retransmitted_total{saddr=~\"$saddr\", sport=~\"$sport\", daddr=~\"$daddr\", dport=~\"$dport\",orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",job=\"$job\"}[5m])"
+              "custom_expression": "sum(rate(tcp_bytes_retransmitted_total{saddr=~\"$saddr\",sport=~\"$sport\",daddr=~\"$daddr\",dport=~\"$dport\",orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",job=\"$job\"}[1m]))"
             }
           ]
         },
@@ -239,7 +284,7 @@
           "panel_id": "Lost Packets (Rate) 📉",
           "queries": [
             {
-              "custom_expression": "rate(tcp_lost_out{saddr=~\"$saddr\", sport=~\"$sport\", daddr=~\"$daddr\", dport=~\"$dport\",orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",job=\"$job\"}[5m])"
+              "custom_expression": "sum(rate(tcp_lost_out{saddr=~\"$saddr\",sport=~\"$sport\",daddr=~\"$daddr\",dport=~\"$dport\",orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",job=\"$job\"}[1m]))"
             }
           ]
         },
@@ -247,7 +292,7 @@
           "panel_id": "Packet Loss Percentage 📊",
           "queries": [
             {
-              "custom_expression": "(sum(rate(tcp_lost_packets{saddr=~\"$saddr\", sport=~\"$sport\", daddr=~\"$daddr\", dport=~\"$dport\",orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",job=\"$job\"}[5m])) / sum(rate(tcp_segments_out_total{saddr=~\"$saddr\", sport=~\"$sport\", daddr=~\"$daddr\", dport=~\"$dport\",orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",job=\"$job\"}[5m]))) * 100"
+              "custom_expression": "sum(rate(tcp_lost_packets{saddr=~\"$saddr\",sport=~\"$sport\",daddr=~\"$daddr\",dport=~\"$dport\",orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",job=\"$job\"}[1m])) / sum(rate(tcp_segments_out_total{saddr=~\"$saddr\",sport=~\"$sport\",daddr=~\"$daddr\",dport=~\"$dport\",orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",job=\"$job\"}[1m])) * 100"
             }
           ]
         },
@@ -255,7 +300,7 @@
           "panel_id": "Retransmission Rate (Bytes) 🔄",
           "queries": [
             {
-              "custom_expression": "rate(tcp_bytes_retransmitted_total{saddr=~\"$saddr\", sport=~\"$sport\", daddr=~\"$daddr\", dport=~\"$dport\",orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",job=\"$job\"}[5m]) / rate(tcp_bytes_acked_total{saddr=~\"$saddr\", sport=~\"$sport\", daddr=~\"$daddr\", dport=~\"$dport\",orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",job=\"$job\"}[5m])"
+              "custom_expression": "sum(rate(tcp_bytes_retransmitted_total{saddr=~\"$saddr\",sport=~\"$sport\",daddr=~\"$daddr\",dport=~\"$dport\",orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",job=\"$job\"}[1m])) / sum(rate(tcp_bytes_acked_total{saddr=~\"$saddr\",sport=~\"$sport\",daddr=~\"$daddr\",dport=~\"$dport\",orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",job=\"$job\"}[1m]))"
             }
           ]
         }
