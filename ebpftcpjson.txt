@@ -37,7 +37,7 @@
     ]
   },
   "groups": [
-    {
+        {
       "group_name": "Exporter Health",
       "panels": [
         {
@@ -50,7 +50,7 @@
         }
       ]
     },
-    {
+        {
       "group_name": "Overall Health",
       "panels": [
         {
@@ -68,18 +68,10 @@
               "custom_expression": "avg(tcp_packets_out{orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",saddr=~\"$saddr\",sport=~\"$sport\",daddr=~\"$daddr\",dport=~\"$dport\",job=\"$job\"})"
             }
           ]
-        },
-        {
-          "panel_id": "Segments In/Out Ratio ➡️⬅️",
-          "queries": [
-            {
-              "custom_expression": "sum(rate(tcp_segments_out_total{orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",saddr=~\"$saddr\",sport=~\"$sport\",daddr=~\"$daddr\",dport=~\"$dport\",job=\"$job\"}[5m])) / sum(rate(tcp_segments_in_total{orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",saddr=~\"$saddr\",sport=~\"$sport\",daddr=~\"$daddr\",dport=~\"$dport\",job=\"$job\"}[5m]))"
-            }
-          ]
         }
       ]
     },
-    {
+        {
       "group_name": "Window Management & Congestion Control",
       "panels": [
         {
@@ -105,12 +97,120 @@
               "custom_expression": "avg(tcp_slow_start_threshold{orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",saddr=~\"$saddr\",sport=~\"$sport\",daddr=~\"$daddr\",dport=~\"$dport\",job=\"$job\"}) by (saddr, daddr, sport, dport)"
             }
           ]
+        }
+      ]
+    },
+    {
+      "group_name": "TCP Advanced Metrics",
+      "panels": [
+        {
+          "panel_id": "SACK Segments 📌",
+          "queries": [
+            {
+              "custom_expression": "rate(tcp_sacked_segments{saddr=~\"$saddr\", sport=~\"$sport\", daddr=~\"$daddr\", dport=~\"$dport\",orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",job=\"$job\"}[5m])"
+            }
+          ]
+        },
+        {
+          "panel_id": "DSACK Duplicate Acknowledgments 🧩",
+          "queries": [
+            {
+              "custom_expression": "sum(rate(tcp_dsack_duplicate_acks{saddr=~\"$saddr\", sport=~\"$sport\", daddr=~\"$daddr\", dport=~\"$dport\",orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",job=\"$job\"}[5m]))"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "group_name": "TCP Throughput & Segments",
+      "panels": [
+        {
+          "panel_id": "Segments Sent (Rate) 📡",
+          "queries": [
+            {
+              "custom_expression": "rate(tcp_segments_out_total{saddr=~\"$saddr\", sport=~\"$sport\", daddr=~\"$daddr\", dport=~\"$dport\",orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",job=\"$job\"}[5m])"
+            }
+          ]
+        },
+        {
+          "panel_id": "Segments Received (Rate) 📥",
+          "queries": [
+            {
+              "custom_expression": "rate(tcp_segments_in_total{saddr=~\"$saddr\", sport=~\"$sport\", daddr=~\"$daddr\", dport=~\"$dport\",orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",job=\"$job\"}[5m])"
+            }
+          ]
+        },
+        {
+          "panel_id": "Bytes Acknowledged (Rate) ✅",
+          "queries": [
+            {
+              "custom_expression": "rate(tcp_bytes_acked_total{saddr=~\"$saddr\", sport=~\"$sport\", daddr=~\"$daddr\", dport=~\"$dport\",orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",job=\"$job\"}[5m])"
+            }
+          ]
         },
         {
           "panel_id": "Unacknowledged Segments 📈",
           "queries": [
             {
-              "custom_expression": "avg(tcp_unacked_segments{orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",saddr=~\"$saddr\",sport=~\"$sport\",daddr=~\"$daddr\",dport=~\"$dport\",job=\"$job\"}) by (saddr, daddr, sport, dport)"
+              "custom_expression": "avg(tcp_unacked_segments{saddr=~\"$saddr\", sport=~\"$sport\", daddr=~\"$daddr\", dport=~\"$dport\",orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",job=\"$job\"}) by (saddr, daddr, sport, dport)"
+            }
+          ]
+        },
+        {
+          "panel_id": "Segments In/Out Ratio ➡️⬅️",
+          "queries": [
+            {
+              "custom_expression": "sum(rate(tcp_segments_out_total{saddr=~\"$saddr\", sport=~\"$sport\", daddr=~\"$daddr\", dport=~\"$dport\",orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",job=\"$job\"}[5m])) / sum(rate(tcp_segments_in_total{saddr=~\"$saddr\", sport=~\"$sport\", daddr=~\"$daddr\", dport=~\"$dport\",orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",job=\"$job\"}[5m]))"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "group_name": "TCP_Session Overview",
+      "panels": [
+        {
+          "panel_id": "Last Seen Session Timestamp (Seconds) 🕰️",
+          "queries": [
+            {
+              "custom_expression": "tcp_session_last_seen_seconds{saddr=~\"$saddr\", sport=~\"$sport\", daddr=~\"$daddr\", dport=~\"$dport\",orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",job=\"$job\"}"
+            }
+          ]
+        },
+        {
+          "panel_id": "Session Events (Rate) 🔔",
+          "queries": [
+            {
+              "custom_expression": "rate(tcp_session_event_count{saddr=~\"$saddr\", sport=~\"$sport\", daddr=~\"$daddr\", dport=~\"$dport\",orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",job=\"$job\"}[5m])"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "group_name": "TCP_Round Trip Time (RTT) & Latency",
+      "panels": [
+        {
+          "panel_id": "Retransmission Timeout (ms) ⌛",
+          "queries": [
+            {
+              "custom_expression": "avg(tcp_retransmission_timeout_milliseconds{saddr=~\"$saddr\", sport=~\"$sport\", daddr=~\"$daddr\", dport=~\"$dport\",orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",job=\"$job\"})"
+            }
+          ]
+        },
+        {
+          "panel_id": "RTT Variance (Jitter) 📊",
+          "queries": [
+            {
+              "custom_expression": "avg(tcp_rtt_variance_microseconds{saddr=~\"$saddr\", sport=~\"$sport\", daddr=~\"$daddr\", dport=~\"$dport\",orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",job=\"$job\"}) by (saddr, daddr, sport, dport)"
+            }
+          ]
+        },
+        {
+          "panel_id": "Smoothed Round Trip Time (SRTT) (Microseconds) ⏱️",
+          "queries": [
+            {
+              "custom_expression": "avg(tcp_srtt_microseconds{saddr=~\"$saddr\", sport=~\"$sport\", daddr=~\"$daddr\", dport=~\"$dport\",orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",job=\"$job\"}) by (saddr, daddr, sport, dport)"
             }
           ]
         }
@@ -120,26 +220,26 @@
       "group_name": "Retransmissions & Packet Loss",
       "panels": [
         {
+          "panel_id": "Total Retransmissions (Rate) 🔁",
+          "queries": [
+            {
+              "custom_expression": "rate(tcp_total_retransmits_total{saddr=~\"$saddr\", sport=~\"$sport\", daddr=~\"$daddr\", dport=~\"$dport\",orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",job=\"$job\"}[5m])"
+            }
+          ]
+        },
+        {
+          "panel_id": "Bytes Retransmitted (Rate) 🔄",
+          "queries": [
+            {
+              "custom_expression": "rate(tcp_bytes_retransmitted_total{saddr=~\"$saddr\", sport=~\"$sport\", daddr=~\"$daddr\", dport=~\"$dport\",orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",job=\"$job\"}[5m])"
+            }
+          ]
+        },
+        {
           "panel_id": "Lost Packets (Rate) 📉",
           "queries": [
             {
-              "custom_expression": "rate(tcp_lost_out{orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",saddr=~\"$saddr\",sport=~\"$sport\",daddr=~\"$daddr\",dport=~\"$dport\",job=\"$job\"}[5m])"
-            }
-          ]
-        },
-        {
-          "panel_id": "Total Retransmitted Segments (Rate) 🔄",
-          "queries": [
-            {
-              "custom_expression": "rate(tcp_total_retransmits_total{orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",saddr=~\"$saddr\",sport=~\"$sport\",daddr=~\"$daddr\",dport=~\"$dport\",job=\"$job\"}[5m])"
-            }
-          ]
-        },
-        {
-          "panel_id": "Packet Reordering (Rate) 🧩",
-          "queries": [
-            {
-              "custom_expression": "rate(tcp_reordering{orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",saddr=~\"$saddr\",sport=~\"$sport\",daddr=~\"$daddr\",dport=~\"$dport\",job=\"$job\"}[5m])"
+              "custom_expression": "rate(tcp_lost_out{saddr=~\"$saddr\", sport=~\"$sport\", daddr=~\"$daddr\", dport=~\"$dport\",orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",job=\"$job\"}[5m])"
             }
           ]
         },
@@ -147,7 +247,7 @@
           "panel_id": "Packet Loss Percentage 📊",
           "queries": [
             {
-              "custom_expression": "(sum(rate(tcp_lost_packets{orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",saddr=~\"$saddr\",sport=~\"$sport\",daddr=~\"$daddr\",dport=~\"$dport\",job=\"$job\"}[5m])) / sum(rate(tcp_segments_out_total{orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",saddr=~\"$saddr\",sport=~\"$sport\",daddr=~\"$daddr\",dport=~\"$dport\",job=\"$job\"}[5m]))) * 100"
+              "custom_expression": "(sum(rate(tcp_lost_packets{saddr=~\"$saddr\", sport=~\"$sport\", daddr=~\"$daddr\", dport=~\"$dport\",orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",job=\"$job\"}[5m])) / sum(rate(tcp_segments_out_total{saddr=~\"$saddr\", sport=~\"$sport\", daddr=~\"$daddr\", dport=~\"$dport\",orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",job=\"$job\"}[5m]))) * 100"
             }
           ]
         },
@@ -155,57 +255,7 @@
           "panel_id": "Retransmission Rate (Bytes) 🔄",
           "queries": [
             {
-              "custom_expression": "rate(tcp_bytes_retransmitted_total{orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",saddr=~\"$saddr\",sport=~\"$sport\",daddr=~\"$daddr\",dport=~\"$dport\",job=\"$job\"}[5m]) / rate(tcp_bytes_acked_total{orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",saddr=~\"$saddr\",sport=~\"$sport\",daddr=~\"$daddr\",dport=~\"$dport\",job=\"$job\"}[5m])"
-            }
-          ]
-        },
-        {
-          "panel_id": "DSACK Duplicate Acknowledgments 🧩",
-          "queries": [
-            {
-              "custom_expression": "sum(rate(tcp_dsack_duplicate_acks{orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",saddr=~\"$saddr\",sport=~\"$sport\",daddr=~\"$daddr\",dport=~\"$dport\",job=\"$job\"}[5m]))"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "group_name": "Round Trip Time (RTT) & Latency",
-      "panels": [
-        {
-          "panel_id": "Smoothed Round Trip Time (SRTT) (Microseconds) ⏱️",
-          "queries": [
-            {
-              "custom_expression": "avg(tcp_srtt_microseconds{orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",saddr=~\"$saddr\",sport=~\"$sport\",daddr=~\"$daddr\",dport=~\"$dport\",job=\"$job\"}) by (saddr, daddr, sport, dport)"
-            }
-          ]
-        },
-        {
-          "panel_id": "Round Trip Time Variation (us) 〰️",
-          "queries": [
-            {
-              "custom_expression": "avg(tcp_rtt_variance_microseconds{orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",saddr=~\"$saddr\",sport=~\"$sport\",daddr=~\"$daddr\",dport=~\"$dport\",job=\"$job\"}) by (saddr, daddr, sport, dport)"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "group_name": "Session Overview",
-      "panels": [
-        {
-          "panel_id": "Session Events (Rate) 🔔",
-          "queries": [
-            {
-              "custom_expression": "rate(tcp_session_event_count{orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",saddr=~\"$saddr\",sport=~\"$sport\",daddr=~\"$daddr\",dport=~\"$dport\",job=\"$job\"}[5m])"
-            }
-          ]
-        },
-        {
-          "panel_id": "Last Seen Session Timestamp (Seconds) 🕰️",
-          "queries": [
-            {
-              "custom_expression": "tcp_session_last_seen_seconds{orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",saddr=~\"$saddr\",sport=~\"$sport\",daddr=~\"$daddr\",dport=~\"$dport\",job=\"$job\"}"
+              "custom_expression": "rate(tcp_bytes_retransmitted_total{saddr=~\"$saddr\", sport=~\"$sport\", daddr=~\"$daddr\", dport=~\"$dport\",orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",job=\"$job\"}[5m]) / rate(tcp_bytes_acked_total{saddr=~\"$saddr\", sport=~\"$sport\", daddr=~\"$daddr\", dport=~\"$dport\",orgid=\"$orgid\",anchorid=\"$anchorid\",instance=\"$instance\",job=\"$job\"}[5m])"
             }
           ]
         }
